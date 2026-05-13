@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONVERj — Converged trade-off engine · Star Industry</title>
+<meta name="description" content="CONVERj is a converged trade-off engine for launch-vehicle and spacecraft architectures. One source of truth, coupled sub-system models, ranked KPIs across every variant — built in-house at Star Industry.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:        #031827;
+    --navy-deep:   #02101C;
+    --panel:       #0A2540;
+    --panel-2:     #0F2F4F;
+    --border:      #153552;
+    --border-soft: #1B3F66;
+    --amber:       #FFAB40;
+    --amber-hover: #FFC172;
+    --amber-dim:   rgba(255,171,64,0.13);
+    --sky:         #7DD3FC;
+    --sky-soft:    #BAE6FD;
+    --sky-dim:     rgba(125,211,252,0.13);
+    --slate:       #94A3B8;
+    --slate-cool:  #64748B;
+    --green:       #5dc880;
+    --green-dim:   rgba(93,200,128,0.10);
+    --red:         #e0573c;
+    --red-dim:     rgba(224,87,60,0.10);
+    --text:        #FFFFFF;
+    --white:       #FFFFFF;
+    --footer-bar:  #111111;
+
+    --gutter:      clamp(1.5rem, 5vw, 6rem);
+    --section-pad: clamp(2.25rem, 4.5vw, 4rem);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: var(--navy); }
+  img { max-width: 100%; display: block; }
+  a { color: var(--sky); text-decoration: none; }
+  a:hover { color: var(--amber); }
+
+  #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
+  nav, section, footer { position: relative; z-index: 1; }
+
+  /* ══════ ANNOUNCEMENT BANNER ══════ */
+  .banner {
+    position: relative; z-index: 101;
+    background: linear-gradient(90deg, transparent, rgba(255,171,64,0.12) 30%, rgba(255,171,64,0.22) 50%, rgba(255,171,64,0.12) 70%, transparent);
+    border-bottom: 1px solid var(--border-soft);
+    text-align: center;
+    padding: 10px 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+  .banner a { color: var(--amber-hover); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ══════ NAV ══════ */
+  nav.site-nav {
+    position: sticky; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem var(--gutter);
+    background: rgba(3,24,39,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.45rem; letter-spacing: 0.18em;
+    color: var(--white);
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-right { display: flex; align-items: center; gap: 1.6rem; }
+  .nav-links { display: flex; gap: 1.6rem; list-style: none; }
+  .nav-links a {
+    color: var(--slate);
+    font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+  .nav-cta {
+    background: var(--amber); color: var(--navy) !important;
+    padding: 0.5rem 1.2rem; font-size: 0.74rem;
+    font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--amber-hover); }
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+  }
+
+  /* ══════ PRIMITIVES ══════ */
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--amber);
+    display: inline-block;
+    margin-bottom: 1.2rem;
+  }
+  .label-sky { color: var(--sky); }
+  .display {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    color: var(--white);
+  }
+  .display em { font-style: normal; color: var(--amber); }
+  .display .light { color: var(--slate); font-weight: 300; }
+  .lede {
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--slate);
+    max-width: 56ch;
+    margin-top: 1.4rem;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.7rem;
+    padding: 0.95rem 1.7rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 0.82rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+  }
+  .btn-primary { background: var(--amber); color: var(--navy); }
+  .btn-primary:hover { background: var(--amber-hover); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--slate); border-color: var(--border-soft); }
+  .btn-ghost:hover { color: var(--amber); border-color: var(--amber); }
+  .btn .arrow { transition: transform 0.2s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+  .text-link {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--amber);
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 0.3rem;
+    transition: color 0.2s, border-color 0.2s, gap 0.2s;
+  }
+  .text-link:hover { color: var(--amber-hover); border-color: var(--amber-hover); gap: 0.85rem; }
+
+  /* ══════ HERO ══════ */
+  .hero {
+    position: relative;
+    padding: clamp(4rem,8vw,7rem) var(--gutter) clamp(3rem,5vw,5rem);
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(255,171,64,0.12) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 50% at 15% 90%, rgba(125,211,252,0.06) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(125,211,252,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125,211,252,0.05) 1px, transparent 1px);
+    background-size: 70px 70px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 75%);
+  }
+  .hero-inner { position: relative; z-index: 2; max-width: 980px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.65rem;
+    background: rgba(255,171,64,0.08);
+    border: 1px solid rgba(255,171,64,0.28);
+    color: var(--amber);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    margin-bottom: 2rem;
+  }
+  .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--amber);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%     { opacity: 0.4; transform: scale(0.65); }
+  }
+  .hero-wordmark {
+    margin-bottom: 1.6rem;
+    line-height: 0;
+  }
+  .converj-wordmark-h {
+    display: inline-block;
+    height: 1.2em;
+    width: auto;
+    vertical-align: -0.28em;
+    margin: 0 0.06em;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .converj-wordmark-hero {
+    display: inline-block;
+    height: clamp(3rem, 9vw, 6rem);
+    width: auto;
+    max-width: 100%;
+  }
+  .hero h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    max-width: 22ch;
+    margin: 0 auto;
+  }
+  .hero h1 em { font-style: normal; color: var(--amber); }
+  .hero-sub {
+    font-size: clamp(0.95rem,1.4vw,1.1rem);
+    color: var(--slate);
+    max-width: 58ch;
+    margin: 1.5rem auto 0;
+    line-height: 1.65;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2.4rem;
+  }
+  .hero-proof {
+    display: flex; gap: 2rem; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .proof-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; color: var(--slate-cool);
+    letter-spacing: 0.08em;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .proof-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); opacity: 0.55; }
+
+  /* ══════ HERO SCREENSHOT ══════ */
+  .hero-screen {
+    position: relative; z-index: 2;
+    max-width: 1100px;
+    margin: 3.5rem auto 0;
+  }
+  .screen-frame {
+    background: var(--panel);
+    border: 1px solid var(--border-soft);
+    overflow: hidden;
+    box-shadow:
+      0 40px 120px rgba(0,0,0,0.55),
+      0 0 80px rgba(255,171,64,0.07);
+  }
+  .screen-bar {
+    background: var(--navy-deep);
+    border-bottom: 1px solid var(--border);
+    padding: 9px 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sdots { display: flex; gap: 5px; }
+  .sdot { width: 10px; height: 10px; border-radius: 50%; }
+  .sdot.r { background: #ff5f57; }
+  .sdot.y { background: #ffbd2e; }
+  .sdot.g { background: #28c840; }
+  .screen-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem; color: var(--slate-cool);
+    margin-left: 0.5rem;
+  }
+  .screen-img { display: block; width: 100%; }
+
+  /* ══════ SECTION SCAFFOLDING ══════ */
+  section.story {
+    padding: var(--section-pad) 0;
+    border-top: 1px solid var(--border);
+  }
+  section.story.alt {
+    background: linear-gradient(180deg, rgba(10,37,64,0.42) 0%, rgba(3,24,39,0.85) 100%);
+  }
+  .story-inner {
+    padding: 0 var(--gutter);
+    max-width: 1280px; margin: 0 auto;
+  }
+  .split {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .split.split-flip > :first-child { order: 2; }
+  .split.split-flip > :last-child  { order: 1; }
+  @media (max-width: 1024px) {
+    .split { grid-template-columns: 1fr; }
+    .split.split-flip > :first-child, .split.split-flip > :last-child { order: 0; }
+  }
+
+  /* ══════ NUMBERS STRIP ══════ */
+  .stat-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-cell { background: var(--navy); padding: 2rem 1.6rem; text-align: center; }
+  .stat-num {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    color: var(--amber);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .stat-label {
+    margin-top: 0.6rem; font-size: 0.78rem;
+    color: var(--slate); line-height: 1.5;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  @media (max-width: 1024px) { .stat-strip { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px)  { .stat-strip { grid-template-columns: 1fr; } }
+
+  /* ══════ VS / COMPARISON TABLE ══════ */
+  .vs-wrap {
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 2.2rem;
+  }
+  .vs-row {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .vs-row:last-child { border-bottom: none; }
+  .vs-row.vs-head { background: var(--panel-2); }
+  .vs-cell {
+    padding: 1rem 1.2rem;
+    font-size: 0.86rem;
+    color: var(--slate);
+    border-right: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  .vs-cell:last-child { border-right: none; }
+  .vs-cell.topic {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem; color: var(--sky);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .vs-cell.bad { color: var(--red); }
+  .vs-cell.good { color: var(--green); }
+  .vs-cell.head {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+    padding: 0.9rem 1.2rem;
+  }
+  .vs-cell.head.amber { color: var(--amber); }
+  @media (max-width: 720px) {
+    .vs-row { grid-template-columns: 1fr; }
+    .vs-cell { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  /* ══════ WORKFLOW PIPELINE ══════ */
+  .pipe {
+    margin-top: 2.5rem;
+    border: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .pipe-row {
+    display: grid; grid-template-columns: 60px 200px 1fr 100px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .pipe-row:last-child { border-bottom: none; }
+  .pipe-row:hover { background: var(--panel-2); }
+  .pipe-n {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--amber);
+    padding: 1rem 1.2rem;
+    border-right: 1px solid var(--border);
+  }
+  .pipe-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem; font-weight: 700;
+    color: var(--white);
+    padding: 1rem 1.2rem;
+    border-right: 1px solid var(--border);
+  }
+  .pipe-desc {
+    font-size: 0.84rem; color: var(--slate);
+    padding: 1rem 1.4rem;
+    line-height: 1.55;
+  }
+  .pipe-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem; letter-spacing: 0.1em;
+    padding: 0.3rem 0.6rem;
+    margin: 1rem 1.2rem;
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 3px;
+    justify-self: end;
+  }
+  .pt-syson { background: var(--sky-dim); color: var(--sky); border: 1px solid rgba(125,211,252,0.3); }
+  .pt-bridge { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(255,171,64,0.3); }
+  .pt-conv { background: var(--green-dim); color: var(--green); border: 1px solid rgba(93,200,128,0.3); }
+  @media (max-width: 800px) {
+    .pipe-row { grid-template-columns: 50px 1fr; gap: 0; }
+    .pipe-name, .pipe-desc { grid-column: 2; padding: 0.4rem 1rem; }
+    .pipe-desc { padding-bottom: 0.9rem; border-bottom: 1px solid var(--border); }
+    .pipe-tag { display: none; }
+    .pipe-n { grid-row: span 2; }
+  }
+
+  /* ══════ DASHBOARD TABS ══════ */
+  .dash-tabs {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+    margin: 2.5rem 0 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .dtab {
+    background: none; border: none; cursor: pointer;
+    padding: 0.7rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    color: var(--slate);
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .dtab:hover { color: var(--white); }
+  .dtab.on { color: var(--amber); border-bottom-color: var(--amber); }
+  .dash-screens { margin-top: 0; }
+  .dash-screen { display: none; border: 1px solid var(--border); border-top: none; background: var(--panel); }
+  .dash-screen.on { display: block; }
+  .dash-screen img { width: 100%; display: block; }
+  .dash-caption {
+    padding: 1.4rem 1.6rem;
+    border-top: 1px solid var(--border);
+    background: var(--navy);
+    font-size: 0.84rem; color: var(--slate); line-height: 1.6;
+  }
+  .dash-caption strong { color: var(--white); font-weight: 600; }
+
+  /* ══════ CASE STUDY ARCAS ══════ */
+  .case-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2.5rem;
+  }
+  .case-cell { background: var(--panel); padding: 2rem 1.8rem; }
+  .case-cell.before { border-top: 3px solid var(--red); }
+  .case-cell.after { border-top: 3px solid var(--green); }
+  .case-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .case-cell.before .case-tag { color: var(--red); }
+  .case-cell.after .case-tag { color: var(--green); }
+  .case-cell h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700; font-size: 1.6rem;
+    color: var(--white); margin-bottom: 0.6rem;
+  }
+  .case-cell h4 .checkmark { color: var(--green); }
+  .case-cell p { font-size: 0.86rem; color: var(--slate); line-height: 1.65; }
+  @media (max-width: 800px) { .case-grid { grid-template-columns: 1fr; } }
+
+  .arcas-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 1.5rem;
+  }
+  .as-cell { background: var(--navy); padding: 1.4rem 1.2rem; text-align: center; }
+  .as-num {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 1.4rem;
+    color: var(--amber); line-height: 1;
+  }
+  .as-label {
+    margin-top: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; color: var(--slate-cool);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  @media (max-width: 600px) { .arcas-stats { grid-template-columns: 1fr 1fr; } }
+
+  /* ══════ ENGAGEMENT PHASES ══════ */
+  .phases {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2.5rem;
+  }
+  .phase {
+    background: var(--panel); padding: 2.2rem 1.8rem;
+    position: relative;
+    border-top: 3px solid var(--amber);
+  }
+  .phase:nth-child(2) { border-top-color: rgba(255,171,64,0.7); }
+  .phase:nth-child(3) { border-top-color: rgba(255,171,64,0.45); }
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.4rem;
+  }
+  .phase-dur {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; color: var(--sky);
+    letter-spacing: 0.06em;
+    margin-bottom: 1.2rem;
+  }
+  .phase h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700; font-size: 1.25rem;
+    color: var(--white); margin-bottom: 0.7rem;
+  }
+  .phase p {
+    font-size: 0.86rem; color: var(--slate);
+    line-height: 1.65;
+  }
+  @media (max-width: 1024px) { .phases { grid-template-columns: 1fr; } }
+
+  .phases-note {
+    margin-top: 2rem;
+    padding: 1.4rem 1.8rem;
+    background: var(--panel);
+    border-left: 3px solid var(--amber);
+    font-size: 1rem; color: var(--white);
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+  .phases-note strong { color: var(--amber); font-weight: 700; }
+
+  /* Trade-off / Compare section */
+  .tradeoff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+    margin-top: 2.5rem;
+  }
+  .tradeoff-points { list-style: none; }
+  .tradeoff-points li {
+    font-size: 0.94rem; color: var(--slate);
+    line-height: 1.6;
+    padding: 0.7rem 0 0.7rem 1.1rem;
+    position: relative;
+    border-top: 1px solid var(--border-soft);
+  }
+  .tradeoff-points li:first-child { border-top: none; padding-top: 0; }
+  .tradeoff-points li:last-child { padding-bottom: 0; }
+  .tradeoff-points li::before {
+    content: '\25A0';
+    position: absolute; left: 0; top: 0.95rem;
+    color: var(--amber); font-size: 0.7rem;
+  }
+  .tradeoff-points li:first-child::before { top: 0.25rem; }
+  .tradeoff-points strong { color: var(--white); font-weight: 600; }
+  .tradeoff-img { aspect-ratio: 16/10; margin: 0; }
+  .tradeoff-img img { object-fit: cover; object-position: center; }
+  @media (max-width: 900px) {
+    .tradeoff-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ARCAS trajectory thumbnails inside before/after cards */
+  .case-img {
+    margin: 1.4rem 0 0;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--navy-deep);
+    position: relative;
+  }
+  .case-img img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  .case-img figcaption {
+    padding: 0.55rem 0.8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    background: rgba(3,24,39,0.55);
+    border-top: 1px solid var(--border);
+  }
+
+    /* Section-level expand/collapse toggle */
+  .sec-toggle {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    margin-top: 2rem;
+    padding: 0.7rem 1.3rem;
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sec-toggle:hover,
+  .sec-toggle[aria-expanded="true"] { background: var(--amber); color: var(--navy); }
+  .sec-toggle .icon-plus {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 0.8rem; font-weight: 700; line-height: 1;
+    transition: transform 0.35s ease;
+  }
+  .sec-toggle[aria-expanded="true"] .icon-plus { transform: rotate(45deg); }
+  .sec-toggle[aria-expanded="true"] .toggle-collapsed { display: none; }
+  .sec-toggle[aria-expanded="false"] .toggle-expanded { display: none; }
+  .sec-detail {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.4s ease, margin 0.3s ease;
+    margin-top: 0;
+  }
+  .sec-detail[data-open="true"] {
+    opacity: 1;
+    margin-top: 2.5rem;
+  }
+
+    /* ══════ CTA BANNER ══════ */
+  .cta-banner {
+    padding: clamp(3.5rem, 7vw, 6rem) var(--gutter);
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(255,171,64,0.12) 0%, transparent 60%),
+      var(--navy);
+    border-top: 1px solid var(--border);
+  }
+  .cta-banner .display { line-height: 1.15; margin: 0 auto; max-width: 22ch; }
+  .cta-banner .lede { margin: 1.4rem auto 0; }
+  /* Story-section ledes should span the full content width to align with the heading,
+     tables and grids beneath them. Keep the 56ch limit only on the centred CTA. */
+  section.story .lede { max-width: none; }
+  .cta-banner-actions {
+    margin-top: 2.2rem;
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+  }
+
+  /* ══════ FOOTER ══════ */
+  footer.site-footer {
+    padding: 3rem var(--gutter) 1.6rem;
+    background: var(--footer-bar);
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 3rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .footer-brand .nav-logo { font-size: 1.4rem; }
+  .footer-brand p {
+    margin-top: 1rem;
+    font-size: 0.82rem; color: var(--slate-cool);
+    line-height: 1.65; max-width: 32ch;
+  }
+  .footer-grid h6 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.64rem; color: var(--slate);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    margin-bottom: 0.9rem;
+  }
+  .footer-grid ul { list-style: none; }
+  .footer-grid li { padding: 0.3rem 0; }
+  .footer-grid li a {
+    color: var(--slate); font-size: 0.82rem;
+    transition: color 0.2s;
+  }
+  .footer-grid li a:hover { color: var(--amber); }
+  @media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px)  { .footer-grid { grid-template-columns: 1fr; } }
+  .footer-bottom {
+    margin-top: 2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #2a2a2a;
+    max-width: 1400px;
+    margin-left: auto; margin-right: auto;
+    display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    font-size: 0.78rem; color: var(--slate-cool);
+  }
+  .footer-tag {
+    font-family: 'Space Mono', monospace;
+    color: var(--sky);
+    letter-spacing: 0.16em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- ══════ ANNOUNCEMENT BANNER ══════ -->
+<div class="banner">
+  Built in-house at Star Industry · Two-week scoping engagements available · <a href="mailto:company@starindustry.space?subject=CONVERj%20engagement">company@starindustry.space →</a>
+</div>
+
+<!-- ══════ NAV ══════ -->
+<nav class="site-nav">
+  <a href="index.html" style="text-decoration:none;"><div class="nav-logo">STAR <span>INDUSTRY</span></div></a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html#offerings">Offerings</a></li>
+      <li><a href="converj.html" class="active">CONVERj</a></li>
+      <li><a href="index.html#roadmap">Roadmap</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+  </div>
+</nav>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="pulse"></span>Tier 2 · Digital Engineering · Star Industry</div>
+
+    <div class="hero-wordmark"><img src="assets/converj_wordmark.png" alt="CONVERj" class="converj-wordmark-hero"></div>
+    <h1>Trade studies in <em>minutes</em>, not weeks.</h1>
+    <p class="hero-sub">
+      A converged trade-off engine for launch-vehicle and spacecraft architectures. One source of truth, coupled sub-system models, with ranked KPIs across every variant — built in-house at Star Industry.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#engage" class="btn btn-primary">Two-week Scoping <span class="arrow">→</span></a>
+      <a href="#arcas" class="btn btn-ghost">See Worked Example</a>
+    </div>
+
+    <div class="hero-proof">
+      <div class="proof-item"><span class="proof-dot"></span>One architecture JSON</div>
+      <div class="proof-item"><span class="proof-dot"></span>Coupled convergence loop</div>
+      <div class="proof-item"><span class="proof-dot"></span>Ranked KPIs across variants</div>
+      <div class="proof-item"><span class="proof-dot"></span>SysON round-trip</div>
+    </div>
+  </div>
+
+  <!-- Dashboard screenshot -->
+  <div class="hero-screen">
+    <div class="screen-frame">
+      <div class="screen-bar">
+        <div class="sdots"><span class="sdot r"></span><span class="sdot y"></span><span class="sdot g"></span></div>
+        <span class="screen-title">CONVERj — architecture dashboard</span>
+      </div>
+      <img class="screen-img" src="assets/converj/slide-30.png" alt="CONVERj architecture dashboard — headline KPIs per architecture with cross-variant ranking">
+    </div>
+  </div>
+</section>
+
+<!-- ══════ PROBLEM SECTION ══════ -->
+<section class="story" id="problem">
+  <div class="story-inner">
+    <span class="label">Case Study · The Trade-Study Problem</span>
+    <h2 class="display">Replace the <em>workbook stack.</em></h2>
+    <p class="lede">
+      Architecture decisions hinge on coupled sub-system models. Running them by hand is slow, lossy and opaque. CONVERj replaces the workbook stack with one architecture JSON and one convergence loop &mdash; so trade studies run in minutes, not weeks.
+    </p>
+
+    <button class="sec-toggle" type="button" data-sec="problem" aria-expanded="false" aria-controls="problem-detail">
+      <span class="icon-plus">+</span>
+      <span class="toggle-collapsed">Compare with Excel</span>
+      <span class="toggle-expanded">Hide comparison</span>
+    </button>
+
+    <div class="sec-detail" id="problem-detail" data-open="false">
+    <div class="vs-wrap">
+      <div class="vs-row vs-head">
+        <div class="vs-cell head">Trade-study task</div>
+        <div class="vs-cell head">Excel workbook stack</div>
+        <div class="vs-cell head amber">CONVERj</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-cell topic">Source of truth</div>
+        <div class="vs-cell bad">Numbers copied by hand between spreadsheets. A single stale cell invalidates the study.</div>
+        <div class="vs-cell good">Single architecture JSON. Models read inputs via dotted paths, write outputs to owned sections.</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-cell topic">Convergence loops</div>
+        <div class="vs-cell bad">Tank sizing and COPV placement iterate against each other. No one has patience for it by hand.</div>
+        <div class="vs-cell good">Conductor runs the full chain to convergence. The optimiser names the violated constraint, not "failed".</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-cell topic">Comparing variants</div>
+        <div class="vs-cell bad">Ten architectures means ten workbooks. KPIs live in different tabs, different formats.</div>
+        <div class="vs-cell good">Cross-variant ranking by any metric, filter, or custom expression. Live in the compare view.</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-cell topic">SysON alignment</div>
+        <div class="vs-cell bad">The authoritative product tree and the workbook diverge within days of the last review.</div>
+        <div class="vs-cell good">Round-trip with SysON: import requirements, validate per loop, push the updated product tree back.</div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ARCAS CASE STUDY ══════ -->
+<section class="story alt" id="arcas">
+  <div class="story-inner">
+    <span class="label">Worked Example · ARCAS</span>
+    <h2 class="display">Sub-orbital sounding rocket. <em>Converged in 3 minutes.</em></h2>
+    <p class="lede">
+      A 1959 USAF / NASA double-base solid sounding rocket. A heritage benchmark with documented apogee, mass and trajectory data — the right vehicle to back-check a Phase A trade-study toolchain. Architecture imported from SysON → full model chain → trajectory matched within 0.2 % of heritage data.
+    </p>
+
+    <div class="arcas-stats">
+      <div class="as-cell"><div class="as-num">64 km</div><div class="as-label">Target apogee</div></div>
+      <div class="as-cell"><div class="as-num">4.5 kg</div><div class="as-label">Payload</div></div>
+      <div class="as-cell"><div class="as-num">85°</div><div class="as-label">Launch elevation</div></div>
+      <div class="as-cell"><div class="as-num">Wallops</div><div class="as-label">Launch site</div></div>
+    </div>
+
+    <button class="sec-toggle" type="button" data-sec="arcas" aria-expanded="false" aria-controls="arcas-detail">
+      <span class="icon-plus">+</span>
+      <span class="toggle-collapsed">See the worked example</span>
+      <span class="toggle-expanded">Hide details</span>
+    </button>
+
+    <div class="sec-detail" id="arcas-detail" data-open="false">
+    <div class="case-grid">
+      <div class="case-cell before">
+        <div class="case-tag">As Imported &middot; 238.5 km</div>
+        <h4>First run overshoots.</h4>
+        <p>
+          +174.5 km vs target. The configuration was sized for a different reference trajectory &mdash; CONVERj names the violated constraint, not just "failed". The optimiser converges from there.
+        </p>
+        <figure class="case-img">
+          <img src="assets/converj/arcas_traj1.jpg" alt="ARCAS first-run trajectory in CONVERj — apogee 238.5 km, overshooting the 64 km target">
+          <figcaption>// First run &mdash; 238.5 km apogee, target 64 km</figcaption>
+        </figure>
+      </div>
+      <div class="case-cell after">
+        <div class="case-tag">Optimised &middot; 64.1 km <span class="checkmark">&check;</span></div>
+        <h4>Bisection finds the answer.</h4>
+        <p>
+          +0.1 km vs target. Bisection on a propellant scaling factor &mdash; full chain re-runs each iteration. Trajectory matched heritage data within 0.2 %. Inert mass scales sub-linearly (k<sup>0&middot;85</sup> default) &mdash; a one-line schema knob.
+        </p>
+        <figure class="case-img">
+          <img src="assets/converj/arcas_traj2.jpg" alt="ARCAS optimised trajectory in CONVERj — apogee 64.1 km, matching the 64 km target">
+          <figcaption>// Optimised &mdash; 64.1 km apogee, 0.2 % vs heritage</figcaption>
+        </figure>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TRADE-OFF SECTION ══════ -->
+<section class="story" id="tradeoff">
+  <div class="story-inner">
+    <span class="label">Compare &amp; Trade-Off</span>
+    <h2 class="display">Rank every variant. <em>Live.</em></h2>
+    <p class="lede">
+      Run many architectures through the same convergence loop, then weight the KPIs that matter to your mission &mdash; mass, &Delta;v, T/W, apogee, cost, microgravity, anything you choose. The ranking updates as you slide each weight, so the solution space is something you steer, not something you receive.
+    </p>
+
+    <button class="sec-toggle" type="button" data-sec="tradeoff" aria-expanded="false" aria-controls="tradeoff-detail">
+      <span class="icon-plus">+</span>
+      <span class="toggle-collapsed">See it in action</span>
+      <span class="toggle-expanded">Hide details</span>
+    </button>
+
+    <div class="sec-detail" id="tradeoff-detail" data-open="false">
+    <div class="tradeoff-grid">
+      <ul class="tradeoff-points">
+        <li><strong>Cross-variant ranking</strong> by any metric, filter, or custom expression.</li>
+        <li><strong>Live weighting sliders</strong> &mdash; explore the solution space against any priority mix without re-running.</li>
+        <li><strong>Score breakdowns</strong> showing each KPI's contribution to the final ranking.</li>
+        <li><strong>Add a new KPI</strong> by editing one config file; every architecture picks it up on the next run.</li>
+      </ul>
+      <figure class="img-frame tradeoff-img">
+        <img src="assets/converj/converj_tradeoff.png" alt="CONVERj trade-off view &mdash; multiple architectures ranked with weighted KPI sliders">
+        <figcaption class="img-caption">// CONVERj &mdash; trade-off view</figcaption>
+      </figure>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ENGAGEMENT MODEL ══════ -->
+<section class="story" id="engage">
+  <div class="story-inner">
+    <span class="label">Engagement Model</span>
+    <h2 class="display">Three phases. <em>Clear scope.</em></h2>
+    <p class="lede">
+      Every engagement starts with a short scoping call, then moves to a fixed-price contract with binding deliverables — no open-ended retainers or T&amp;M surprises. Scope and deliverables are agreed jointly before work begins. Indicative durations are for a typical launch-vehicle trade study; timelines flex to match your programme cadence.
+    </p>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="phase-num">Phase 1 · Scope &amp; Seed</div>
+        <div class="phase-dur">2 weeks</div>
+        <h4>Ingest your mission requirement.</h4>
+        <p>We ingest your mission requirement, stand up the systems-engineering baseline, and seed a candidate architecture. <strong style="color:var(--white);font-weight:500;">Outputs:</strong> scoping memo, initial requirements set, baseline architecture.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">Phase 2 · Trade Study</div>
+        <div class="phase-dur">4 – 8 weeks</div>
+        <h4>Run every variant of interest.</h4>
+        <p>We run the model chain across every variant of interest — propellant, staging, engine count. You receive ranked KPIs, convergence reports, and the live CONVERj dashboard.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">Phase 3 · Handover</div>
+        <div class="phase-dur">2 weeks</div>
+        <h4>Your team keeps the output.</h4>
+        <p>Your team keeps the repository. We train on conductor use, model authoring and the SysON round-trip. Ongoing support by retainer.</p>
+      </div>
+    </div>
+
+    <div class="phases-note">
+      Three phases. Clear scope. <strong>Your team keeps the output.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FINAL CTA ══════ -->
+<section class="cta-banner" id="contact">
+  <span class="label">Let&rsquo;s Work Together</span>
+  <h2 class="display"><em>Bring your mission.</em> <span class="light">Together we&rsquo;ll</span><br><img src="assets/converj_wordmark.png" alt="CONVERj" class="converj-wordmark-h"><br><span class="light">on your architecture.</span></h2>
+  <p class="lede">
+    Two-week scoping phase to translate your objective into a structured trade study — delivered as ranked architectures in CONVERj, with a trajectory and performance baseline attached.
+  </p>
+  <div class="cta-banner-actions">
+    <a href="mailto:company@starindustry.space?subject=CONVERj%20engagement" class="btn btn-primary">Start Scoping <span class="arrow">→</span></a>
+    <a href="index.html" class="btn btn-ghost">Back to Star Industry</a>
+  </div>
+</section>
+
+<!-- ══════ FOOTER ══════ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">STAR <span>INDUSTRY</span></div>
+      <p>A European engineering company building the systems that move beyond LEO.</p>
+    </div>
+    <div>
+      <h6>Offerings</h6>
+      <ul>
+        <li><a href="index.html#offerings">Tier 1 &middot; Services</a></li>
+        <li><a href="index.html#offerings">Tier 2 &middot; Products</a></li>
+        <li><a href="index.html#offerings">Tier 3 &middot; Vehicles</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>Company</h6>
+      <ul>
+        <li><a href="about.html">About / Team</a></li>
+        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:company@starindustry.space">company@starindustry.space</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Star Industry Ltd &middot; Company No. 17048178 &middot; Forres, Inverness, UK</span>
+    <span class="footer-tag">// Engineering the in-space economy</span>
+  </div>
+</footer>
+
+<script>
+/* Starfield */
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], shooters = [];
+  const STAR_COUNT = 520;
+  const AMBER = 'rgba(255,171,64,';
+  const SKY   = 'rgba(125,211,252,';
+  const WHITE = 'rgba(255,255,255,';
+  function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  function rb(a,b){return a + Math.random()*(b-a);}
+  function makeStar() {
+    const r = Math.random();
+    let color = r<0.05?AMBER : r<0.12?SKY : WHITE;
+    return {x:Math.random()*W, y:Math.random()*H, r:rb(0.3,1.3), alpha:rb(0.2,0.85),
+      drift:rb(-0.008,0.008), twinkleSpeed:rb(0.003,0.012), twinkleDir:Math.random()<0.5?1:-1, color};
+  }
+  function initStars(){ stars = Array.from({length:STAR_COUNT}, makeStar); }
+  function makeShooter() {
+    const angle = rb(200,240)*Math.PI/180; const speed = rb(6,14);
+    const r = Math.random();
+    const color = r<0.35?AMBER : r<0.55?SKY : WHITE;
+    return {x:rb(W*0.3,W), y:rb(0,H*0.5), vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+      alpha:1, fade:rb(0.012,0.022), color, trail:[]};
+  }
+  function scheduleShooter() {
+    setTimeout(() => {
+      if (!document.hidden) shooters.push(makeShooter());
+      scheduleShooter();
+    }, rb(25000, 75000));
+  }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.alpha += s.twinkleSpeed*s.twinkleDir;
+      if (s.alpha>0.92||s.alpha<0.1) s.twinkleDir*=-1;
+      s.x += s.drift; if (s.x<0) s.x=W; if (s.x>W) s.x=0;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = s.color + s.alpha.toFixed(2)+')'; ctx.fill();
+    });
+    shooters = shooters.filter(s=>s.alpha>0);
+    shooters.forEach(s=>{
+      s.trail.push({x:s.x,y:s.y});
+      if (s.trail.length>24) s.trail.shift();
+      s.x+=s.vx; s.y+=s.vy; s.alpha-=s.fade;
+      if (s.trail.length>1) {
+        const t = s.trail[0];
+        const g = ctx.createLinearGradient(t.x,t.y,s.x,s.y);
+        g.addColorStop(0, s.color+'0)');
+        g.addColorStop(0.6, s.color+(s.alpha*0.4).toFixed(2)+')');
+        g.addColorStop(1, s.color+s.alpha.toFixed(2)+')');
+        ctx.beginPath(); ctx.moveTo(t.x,t.y);
+        s.trail.forEach(p=>ctx.lineTo(p.x,p.y));
+        ctx.lineTo(s.x,s.y);
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(s.x,s.y,1.5,0,Math.PI*2);
+      ctx.fillStyle = s.color+s.alpha.toFixed(2)+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  addEventListener('resize', ()=>{ resize(); initStars(); });
+  /* When the tab regains focus after being hidden, throw away any shooters
+     that were queued so we don't get a "meteor shower" catch-up. */
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) shooters.length = 0;
+  });
+  resize(); initStars(); scheduleShooter(); draw();
+})();
+
+/* Section accordion (Problem / ARCAS / Trade-off / Engagement) */
+(function() {
+  const toggles = document.querySelectorAll('.sec-toggle[data-sec]');
+  function navHeight() {
+    const nav = document.querySelector('nav.site-nav');
+    return nav ? nav.offsetHeight : 0;
+  }
+  function setOpen(panel, open) {
+    if (open) {
+      panel.dataset.open = 'true';
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      const onEnd = e => {
+        if (e.propertyName !== 'max-height') return;
+        if (panel.dataset.open === 'true') panel.style.maxHeight = '8000px';
+        panel.removeEventListener('transitionend', onEnd);
+      };
+      panel.addEventListener('transitionend', onEnd);
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      void panel.offsetHeight;
+      panel.dataset.open = 'false';
+      panel.style.maxHeight = '0px';
+    }
+  }
+  function toggleSection(btn) {
+    const sec = btn.dataset.sec;
+    const panel = document.getElementById(sec + '-detail');
+    if (!panel) return;
+    const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', wasOpen ? 'false' : 'true');
+    setOpen(panel, !wasOpen);
+  }
+  toggles.forEach(btn => {
+    btn.addEventListener('click', () => toggleSection(btn));
+  });
+})();
+</script>
+</body>
+</html>

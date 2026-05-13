@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About &mdash; Star Industry</title>
+<meta name="description" content="Star Industry leadership and team &mdash; senior aerospace operators with 35+ years across European launch, satellite and structural-engineering programmes.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:        #031827;
+    --navy-deep:   #02101C;
+    --panel:       #0A2540;
+    --panel-2:     #0F2F4F;
+    --border:      #153552;
+    --border-soft: #1B3F66;
+    --amber:       #FFAB40;
+    --amber-hover: #FFC172;
+    --sky:         #7DD3FC;
+    --sky-soft:    #BAE6FD;
+    --slate:       #94A3B8;
+    --slate-cool:  #64748B;
+    --text:        #FFFFFF;
+    --white:       #FFFFFF;
+    --footer-bar:  #111111;
+    --gutter:      clamp(1.5rem, 5vw, 6rem);
+    --section-pad: clamp(4.5rem, 9vw, 8rem);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy); color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    overflow-x: hidden; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: var(--navy); }
+  img { max-width: 100%; display: block; }
+  a { color: var(--sky); text-decoration: none; }
+  a:hover { color: var(--amber); }
+
+  #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
+  nav, section, footer { position: relative; z-index: 1; }
+
+  /* ══ NAV ══ */
+  nav.site-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem var(--gutter);
+    background: rgba(3,24,39,0.78);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.45rem; letter-spacing: 0.18em;
+    color: var(--white);
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-right { display: flex; align-items: center; gap: 1.8rem; }
+  .nav-links { display: flex; gap: 1.8rem; list-style: none; }
+  .nav-links a {
+    color: var(--slate); font-size: 0.76rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+  .nav-cta {
+    background: var(--amber); color: var(--navy) !important;
+    padding: 0.52rem 1.3rem; font-size: 0.74rem;
+    font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--amber-hover); }
+  @media (max-width: 1024px) { .nav-links { display: none; } }
+
+  /* ══ PRIMITIVES ══ */
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--sky);
+    display: inline-block; margin-bottom: 1.4rem;
+  }
+  .display {
+    font-family: 'DM Sans', sans-serif; font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    line-height: 1.0; letter-spacing: -0.025em;
+    color: var(--white);
+  }
+  .display em { font-style: normal; color: var(--amber); }
+  .display .light { color: var(--slate); font-weight: 300; }
+  .lede {
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.65; color: var(--slate);
+    max-width: 56ch; margin-top: 1.3rem;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.7rem;
+    padding: 0.95rem 1.7rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 0.82rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid transparent; cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+  }
+  .btn-primary { background: var(--amber); color: var(--navy); }
+  .btn-primary:hover { background: var(--amber-hover); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--slate); border-color: var(--border-soft); }
+  .btn-ghost:hover { color: var(--amber); border-color: var(--amber); }
+  .btn .arrow { transition: transform 0.2s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* ══ HERO ══ */
+  .hero {
+    padding: calc(6rem + var(--gutter)) var(--gutter) clamp(2.5rem, 5vw, 4rem);
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 70% 40%, rgba(255,171,64,0.10) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 50% at 15% 90%, rgba(125,211,252,0.05) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(125,211,252,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125,211,252,0.045) 1px, transparent 1px);
+    background-size: 70px 70px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 75%);
+  }
+  .hero-inner {
+    position: relative; z-index: 2;
+    max-width: 1280px; margin: 0 auto;
+  }
+
+  /* ══ SECTIONS ══ */
+  section.story {
+    padding: var(--section-pad) 0;
+    border-top: 1px solid var(--border);
+  }
+  section.story.alt {
+    background: linear-gradient(180deg, rgba(10,37,64,0.42) 0%, rgba(3,24,39,0.85) 100%);
+  }
+  .story-inner {
+    padding: 0 var(--gutter);
+    max-width: 1280px; margin: 0 auto;
+  }
+
+  /* ══ TEAM ══ */
+  .team-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+  .team-card {
+    background: var(--panel); padding: 2.4rem 2rem;
+    transition: background 0.25s;
+  }
+  .team-card:hover { background: var(--panel-2); }
+  .team-avatar {
+    width: 112px; height: 112px;
+    border-radius: 50%;
+    background: var(--navy-deep);
+    margin-bottom: 1.4rem;
+    border: 2px solid var(--border-soft);
+    overflow: hidden;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; color: var(--amber);
+    letter-spacing: 0.05em;
+  }
+  .team-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .team-avatar.no-photo { font-size: 2rem; }
+  .team-card h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700; font-size: 1.15rem;
+    color: var(--white); margin-bottom: 0.3rem;
+  }
+  .team-role {
+    font-size: 0.74rem; color: var(--amber);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  .team-bio {
+    font-size: 0.86rem; color: var(--slate);
+    line-height: 1.6; margin-bottom: 1.2rem;
+  }
+  .team-prev {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem; color: var(--sky);
+    letter-spacing: 0.04em; line-height: 1.75;
+    opacity: 0.85;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border-soft);
+  }
+  @media (max-width: 1024px) { .team-grid { grid-template-columns: 1fr; } }
+
+  /* ══ COMPANY FACTS ══ */
+  .facts {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-cell { background: var(--navy); padding: 2.2rem 1.6rem; }
+  .fact-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--slate);
+    margin-bottom: 0.6rem;
+  }
+  .fact-num {
+    font-family: 'DM Sans', sans-serif; font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    color: var(--amber); letter-spacing: -0.02em; line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .fact-sub { font-size: 0.78rem; color: var(--slate); line-height: 1.45; }
+  .facts.facts-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 1024px) {
+    .facts { grid-template-columns: 1fr 1fr; }
+    .facts.facts-3 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .facts { grid-template-columns: 1fr; }
+    .facts.facts-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ══ CTA ══ */
+  .cta-banner {
+    padding: var(--section-pad) var(--gutter);
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(255,171,64,0.12) 0%, transparent 60%),
+      var(--navy);
+    border-top: 1px solid var(--border);
+  }
+  .cta-banner .display { line-height: 1.15; margin: 0 auto; max-width: 22ch; }
+  .converj-wordmark-h {
+    display: inline-block;
+    height: 1.2em; width: auto;
+    vertical-align: -0.28em;
+    margin: 0 0.06em;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .cta-banner .lede { margin: 1.4rem auto 0; }
+  .cta-banner-actions {
+    margin-top: 2.2rem;
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+  }
+
+  /* ══ FOOTER ══ */
+  footer.site-footer {
+    padding: 3rem var(--gutter) 1.8rem;
+    background: var(--footer-bar);
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 3rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .footer-brand .nav-logo { font-size: 1.4rem; }
+  .footer-brand p {
+    margin-top: 1rem;
+    font-size: 0.82rem; color: var(--slate-cool);
+    line-height: 1.65; max-width: 32ch;
+  }
+  .footer-grid h6 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.64rem; color: var(--slate);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    margin-bottom: 0.9rem;
+  }
+  .footer-grid ul { list-style: none; }
+  .footer-grid li { padding: 0.3rem 0; }
+  .footer-grid li a {
+    color: var(--slate); font-size: 0.82rem;
+    transition: color 0.2s;
+  }
+  .footer-grid li a:hover { color: var(--amber); }
+  .footer-bottom {
+    margin-top: 2.2rem; padding-top: 1.2rem;
+    border-top: 1px solid #2a2a2a;
+    max-width: 1400px; margin-left: auto; margin-right: auto;
+    display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    font-size: 0.76rem; color: var(--slate-cool);
+  }
+  .footer-tag {
+    font-family: 'Space Mono', monospace;
+    color: var(--sky);
+    letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  @media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px)  { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- ══ NAV ══ -->
+<nav class="site-nav">
+  <a href="index.html" style="text-decoration:none;"><div class="nav-logo">STAR <span>INDUSTRY</span></div></a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html#offerings">Offerings</a></li>
+      <li><a href="converj.html">CONVERj</a></li>
+      <li><a href="index.html#roadmap">Roadmap</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <span class="label">About Us</span>
+    <h1 class="display"><span class="light">Senior aerospace operators</span> <em>building Europe's in-orbit production layer.</em></h1>
+    <p class="lede" style="max-width: 64ch">
+      Three founders with a combined 35+ years experience across European launch, satellite and structural-engineering programmes &mdash; joined by a growing engineering team.
+    </p>
+  </div>
+</section>
+
+<!-- ══ COMPANY FACTS ══ -->
+<section style="padding:0;">
+  <div class="facts facts-3">
+    <div class="fact-cell">
+      <div class="fact-key">Founded</div>
+      <div class="fact-num">2026</div>
+      <div class="fact-sub">Star Industry Ltd &middot; No. 17048178</div>
+    </div>
+    <div class="fact-cell">
+      <div class="fact-key">Base</div>
+      <div class="fact-num">UK</div>
+      <div class="fact-sub">Forres, Inverness, UK</div>
+    </div>
+    <div class="fact-cell">
+      <div class="fact-key">Experience</div>
+      <div class="fact-num">35+ yrs</div>
+      <div class="fact-sub">Combined across 3 founders from the aerospace industry</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LEADERSHIP ══ -->
+<section class="story" id="leadership">
+  <div class="story-inner">
+    <span class="label">Leadership</span>
+    <h2 class="display">Built by a <em>senior aerospace team.</em></h2>
+    <p class="lede" style="max-width:64ch">
+      Founder-operators with deep experience across European launch-vehicle, satellite and composite-structures programmes &mdash; backed by a growing engineering bench drawn from across the European space ecosystem.
+    </p>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar"><img src="assets/team/damien.png" alt="Damien Gueydan" onerror="this.parentNode.classList.add('no-photo'); this.parentNode.innerHTML='DG';"></div>
+        <h3>Damien Gueydan</h3>
+        <div class="team-role">Chief Executive Officer</div>
+        <div class="team-bio">Structural engineering leader with 10+ years of aerospace experience. Specialises in large composite cryogenic pressure vessels and end-to-end hardware delivery across complex programmes.</div>
+        <div class="team-prev">ex-Head of Structures / Deputy CTO, Orbex<br>Orbex &middot; UKRI &middot; Rolls-Royce<br>MEng/MSc Mechanical Engineering</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar"><img src="assets/team/oliver.png" alt="Oliver Turnbull" onerror="this.parentNode.classList.add('no-photo'); this.parentNode.innerHTML='OT';"></div>
+        <h3>Dr. Oliver Turnbull</h3>
+        <div class="team-role">Chief Technology Officer</div>
+        <div class="team-bio">Systems engineering leader with 15+ years in aerospace and commercial launch-vehicle development. Specialises in mission architecture, technical governance and R&amp;D strategy.</div>
+        <div class="team-prev">ex-Chief Mission Architect, Orbex<br>Orbex &middot; UKSA &middot; Deimos<br>PhD in Engineering Mathematics</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar"><img src="assets/team/francesco.png" alt="Francesco Iervese" onerror="this.parentNode.classList.add('no-photo'); this.parentNode.innerHTML='FI';"></div>
+        <h3>Francesco Iervese</h3>
+        <div class="team-role">Chief Operating Officer</div>
+        <div class="team-bio">Aerospace engineer with 10+ years of space-industry experience. Specialises in AIT, testing, orbital launch operations and team leadership.</div>
+        <div class="team-prev">ex-VP AIT, Orbex<br>Orbex &middot; Avio &middot; Argotec &middot; DLR<br>MSc Space Engineering</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW WE WORK ══ -->
+<section class="story alt" id="how-we-work">
+  <div class="story-inner">
+    <span class="label">How We Work</span>
+    <h2 class="display">Skunkworks <em>by default.</em></h2>
+    <p class="lede" style="max-width:64ch">
+      Small, autonomous, time-boxed teams converge on architecture before completing detail. This is the operating norm &mdash; not a special exception. As programmes mature, a complementary delivery mode is added deliberately. Five beliefs guide how the team works day-to-day.
+    </p>
+    <div style="margin-top:2.5rem; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border);">
+      <div style="background: var(--panel); padding: 1.4rem 1.2rem;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--amber); margin-bottom: 0.5rem;">01</div>
+        <div style="font-weight: 700; font-size: 0.94rem; color: var(--white); margin-bottom: 0.4rem;">Momentum beats certainty.</div>
+        <div style="font-size: 0.8rem; color: var(--slate); line-height: 1.55;">Act before certainty; learn through rapid iteration.</div>
+      </div>
+      <div style="background: var(--panel); padding: 1.4rem 1.2rem;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--amber); margin-bottom: 0.5rem;">02</div>
+        <div style="font-weight: 700; font-size: 0.94rem; color: var(--white); margin-bottom: 0.4rem;">Architecture before completeness.</div>
+        <div style="font-size: 0.8rem; color: var(--slate); line-height: 1.55;">Incomplete detail is acceptable; architectural ambiguity is not.</div>
+      </div>
+      <div style="background: var(--panel); padding: 1.4rem 1.2rem;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--amber); margin-bottom: 0.5rem;">03</div>
+        <div style="font-weight: 700; font-size: 0.94rem; color: var(--white); margin-bottom: 0.4rem;">Simplicity enables speed.</div>
+        <div style="font-size: 0.8rem; color: var(--slate); line-height: 1.55;">Complexity is a cost. If two options work, the simpler one wins.</div>
+      </div>
+      <div style="background: var(--panel); padding: 1.4rem 1.2rem;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--amber); margin-bottom: 0.5rem;">04</div>
+        <div style="font-weight: 700; font-size: 0.94rem; color: var(--white); margin-bottom: 0.4rem;">Data decides.</div>
+        <div style="font-size: 0.8rem; color: var(--slate); line-height: 1.55;">Engineering is done with numbers.</div>
+      </div>
+      <div style="background: var(--panel); padding: 1.4rem 1.2rem;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--amber); margin-bottom: 0.5rem;">05</div>
+        <div style="font-weight: 700; font-size: 0.94rem; color: var(--white); margin-bottom: 0.4rem;">Ownership is non-delegable.</div>
+        <div style="font-size: 0.8rem; color: var(--slate); line-height: 1.55;">Every project has one accountable owner and one technical authority.</div>
+      </div>
+    </div>
+    <p style="margin-top: 2rem; font-size: 0.84rem; color: var(--slate-cool); line-height: 1.6;">
+      Hiring across structures, propulsion, systems engineering and software. If you've built composite hardware, run trade studies on real launch-vehicle programmes, or been an in-the-loop AIT engineer &mdash; we'd like to hear from you.
+    </p>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">
+      <a href="mailto:company@starindustry.space?subject=Hiring%20enquiry">company@starindustry.space &rarr;</a>
+    </p>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="cta-banner">
+  <span class="label">Get In Touch</span>
+  <h2 class="display"><em>Bring your mission.</em> <span class="light">Together we&rsquo;ll</span><br><img src="assets/converj_wordmark.png" alt="CONVERj" class="converj-wordmark-h"><br><span class="light">on your architecture.</span></h2>
+  <p class="lede">
+    Partner, collaborator or future hire &mdash; we&rsquo;d like to hear from you.
+  </p>
+  <div class="cta-banner-actions">
+    <a href="mailto:company@starindustry.space" class="btn btn-primary">Start a Conversation <span class="arrow">&rarr;</span></a>
+    <a href="index.html" class="btn btn-ghost">Back to Star Industry</a>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">STAR <span>INDUSTRY</span></div>
+      <p>A European engineering company building the systems that move beyond LEO.</p>
+    </div>
+    <div>
+      <h6>Offerings</h6>
+      <ul>
+        <li><a href="index.html#offerings">Tier 1 &middot; Services</a></li>
+        <li><a href="index.html#offerings">Tier 2 &middot; Products</a></li>
+        <li><a href="index.html#offerings">Tier 3 &middot; Vehicles</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>Company</h6>
+      <ul>
+        <li><a href="about.html">About / Team</a></li>
+        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:company@starindustry.space">company@starindustry.space</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Star Industry Ltd &middot; Company No. 17048178 &middot; Forres, Inverness, UK</span>
+    <span class="footer-tag">// Engineering the in-space economy</span>
+  </div>
+</footer>
+
+<script>
+/* Starfield */
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], shooters = [];
+  const STAR_COUNT = 520;
+  const AMBER = 'rgba(255,171,64,';
+  const SKY   = 'rgba(125,211,252,';
+  const WHITE = 'rgba(255,255,255,';
+  function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  function rb(a,b){return a + Math.random()*(b-a);}
+  function makeStar() {
+    const r = Math.random();
+    let color = r<0.05?AMBER : r<0.12?SKY : WHITE;
+    return {x:Math.random()*W, y:Math.random()*H, r:rb(0.3,1.3), alpha:rb(0.2,0.85),
+      drift:rb(-0.008,0.008), twinkleSpeed:rb(0.003,0.012), twinkleDir:Math.random()<0.5?1:-1, color};
+  }
+  function initStars(){ stars = Array.from({length:STAR_COUNT}, makeStar); }
+  function makeShooter() {
+    const angle = rb(200,240)*Math.PI/180; const speed = rb(6,14);
+    const r = Math.random();
+    const color = r<0.35?AMBER : r<0.55?SKY : WHITE;
+    return {x:rb(W*0.3,W), y:rb(0,H*0.5), vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+      alpha:1, fade:rb(0.012,0.022), color, trail:[]};
+  }
+  function scheduleShooter() {
+    setTimeout(() => {
+      if (!document.hidden) shooters.push(makeShooter());
+      scheduleShooter();
+    }, rb(25000, 75000));
+  }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.alpha += s.twinkleSpeed*s.twinkleDir;
+      if (s.alpha>0.92||s.alpha<0.1) s.twinkleDir*=-1;
+      s.x += s.drift; if (s.x<0) s.x=W; if (s.x>W) s.x=0;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = s.color + s.alpha.toFixed(2)+')'; ctx.fill();
+    });
+    shooters = shooters.filter(s=>s.alpha>0);
+    shooters.forEach(s=>{
+      s.trail.push({x:s.x,y:s.y});
+      if (s.trail.length>24) s.trail.shift();
+      s.x+=s.vx; s.y+=s.vy; s.alpha-=s.fade;
+      if (s.trail.length>1) {
+        const t = s.trail[0];
+        const g = ctx.createLinearGradient(t.x,t.y,s.x,s.y);
+        g.addColorStop(0, s.color+'0)');
+        g.addColorStop(0.6, s.color+(s.alpha*0.4).toFixed(2)+')');
+        g.addColorStop(1, s.color+s.alpha.toFixed(2)+')');
+        ctx.beginPath(); ctx.moveTo(t.x,t.y);
+        s.trail.forEach(p=>ctx.lineTo(p.x,p.y));
+        ctx.lineTo(s.x,s.y);
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(s.x,s.y,1.5,0,Math.PI*2);
+      ctx.fillStyle = s.color+s.alpha.toFixed(2)+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  addEventListener('resize', ()=>{ resize(); initStars(); });
+  /* When the tab regains focus after being hidden, throw away any shooters
+     that were queued so we don't get a "meteor shower" catch-up. */
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) shooters.length = 0;
+  });
+  resize(); initStars(); scheduleShooter(); draw();
+})();
+</script>
+</body>
+</html>
