@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — New Glenn NG-4 Blast &amp; Debris Hazard Analysis | Star Industry</title>
+<meta name="description" content="Frame-by-frame forensic blast and debris-hazard analysis of the New Glenn NG-4 explosion at LC-36, 28 May 2026. Shock wave tracking, TNT equivalence, fireball modelling, explosion height estimation, debris fragment trajectory.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:        #031827;
+    --navy-deep:   #02101C;
+    --panel:       #0A2540;
+    --panel-2:     #0F2F4F;
+    --border:      #153552;
+    --border-soft: #1B3F66;
+    --amber:       #FFAB40;
+    --amber-hover: #FFC172;
+    --sky:         #7DD3FC;
+    --sky-soft:    #BAE6FD;
+    --slate:       #94A3B8;
+    --slate-cool:  #64748B;
+    --text:        #FFFFFF;
+    --white:       #FFFFFF;
+    --footer-bar:  #111111;
+    --gutter:      clamp(1.5rem, 5vw, 6rem);
+    --section-pad: clamp(3.5rem, 7vw, 6rem);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: var(--navy); }
+  img { max-width: 100%; display: block; }
+  a { color: var(--sky); text-decoration: none; }
+  a:hover { color: var(--amber); }
+
+  #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
+  nav, main, footer { position: relative; z-index: 1; }
+
+  /* ── NAV ── */
+  nav.site-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem var(--gutter);
+    background: rgba(3,24,39,0.82); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.45rem; letter-spacing: 0.18em; color: var(--white); }
+  .nav-logo span { color: var(--amber); }
+  .nav-right { display: flex; align-items: center; gap: 1.8rem; }
+  .nav-links { display: flex; gap: 1.8rem; list-style: none; }
+  .nav-links a { color: var(--slate); font-size: 0.76rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+  .nav-cta { background: var(--amber); color: var(--navy) !important; padding: 0.52rem 1.3rem; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 2px; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--amber-hover); }
+  @media (max-width: 1024px) { .nav-links { display: none; } }
+
+  /* ── PRIMITIVES ── */
+  .label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--sky); display: inline-block; margin-bottom: 1.2rem; }
+  .label-amber { color: var(--amber); }
+  .display-sm { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(1.5rem, 2.8vw, 2.2rem); line-height: 1.1; letter-spacing: -0.02em; color: var(--white); }
+  .display-sm em { font-style: normal; color: var(--amber); }
+  .lede { font-size: clamp(1rem, 1.3vw, 1.12rem); line-height: 1.7; color: var(--slate); max-width: 58ch; margin-top: 1.2rem; }
+  .btn { display: inline-flex; align-items: center; gap: 0.7rem; padding: 0.9rem 1.6rem; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid transparent; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s; }
+  .btn-primary { background: var(--amber); color: var(--navy); }
+  .btn-primary:hover { background: var(--amber-hover); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--slate); border-color: var(--border-soft); }
+  .btn-ghost:hover { color: var(--amber); border-color: var(--amber); }
+  .text-link { display: inline-flex; align-items: center; gap: 0.55rem; font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); border-bottom: 1px solid var(--amber); padding-bottom: 0.3rem; transition: color 0.2s, border-color 0.2s, gap 0.2s; }
+  .text-link:hover { color: var(--amber-hover); border-color: var(--amber-hover); gap: 0.85rem; }
+
+  /* ── HERO ── */
+  .hero { min-height: 82vh; padding: calc(7rem + var(--gutter)) var(--gutter) 5rem; display: flex; flex-direction: column; justify-content: flex-end; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(ellipse 70% 55% at 75% 45%, rgba(255,171,64,0.13) 0%, transparent 65%), radial-gradient(ellipse 50% 50% at 10% 70%, rgba(125,211,252,0.06) 0%, transparent 55%); }
+  .hero-grid { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(rgba(125,211,252,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,0.04) 1px, transparent 1px); background-size: 70px 70px; mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 75%); }
+  .hero-inner { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; width: 100%; }
+  .hero-breadcrumb { display: flex; align-items: center; gap: 0.6rem; font-family: 'Space Mono', monospace; font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--slate-cool); margin-bottom: 2rem; }
+  .hero-breadcrumb span { color: var(--amber); }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(255,171,64,0.08); border: 1px solid rgba(255,171,64,0.28); color: var(--amber); font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.42rem 1rem; border-radius: 999px; margin-bottom: 1.6rem; }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); animation: blink 2.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.65); } }
+  .hero h1 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(2.4rem, 6vw, 5.4rem); line-height: 0.97; letter-spacing: -0.025em; color: var(--white); max-width: 20ch; margin-bottom: 1.6rem; }
+  .hero h1 em { font-style: normal; color: var(--amber); }
+  .hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2.4rem; }
+  .hero-meta-item { font-family: 'Space Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  .hero-meta-item .k { color: var(--slate-cool); margin-bottom: 0.2rem; }
+  .hero-meta-item .v { color: var(--white); font-weight: 700; }
+
+  /* ── CTA BANNER ── */
+  .cta-banner { background: linear-gradient(135deg, rgba(255,171,64,0.08) 0%, rgba(10,37,64,0.95) 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: clamp(2.5rem, 5vw, 4rem) var(--gutter); position: relative; z-index: 1; }
+  .cta-banner-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+  .cta-banner-inner .label { margin-bottom: 0.8rem; }
+  .cta-banner h2 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(1.3rem, 2.5vw, 1.9rem); line-height: 1.15; letter-spacing: -0.02em; color: var(--white); margin-bottom: 0.8rem; }
+  .cta-banner h2 em { font-style: normal; color: var(--amber); }
+  .cta-banner p { font-size: 0.92rem; color: var(--slate); line-height: 1.65; max-width: 64ch; }
+  .cta-banner p strong { color: var(--white); font-weight: 600; }
+  .cta-banner-actions { display: flex; flex-direction: column; gap: 0.8rem; align-items: flex-end; white-space: nowrap; }
+  @media (max-width: 900px) { .cta-banner-inner { grid-template-columns: 1fr; } .cta-banner-actions { align-items: flex-start; flex-direction: row; flex-wrap: wrap; } }
+
+  /* ── ACCORDION SECTIONS (matching index.html offering pattern) ── */
+  .cs-sections { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter); }
+  .cs-item { border-bottom: 1px solid var(--border); }
+  .cs-item:first-child { border-top: 1px solid var(--border); }
+
+  .cs-trigger {
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) 1fr minmax(150px, 200px) auto;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    width: 100%; background: var(--panel);
+    padding: 1.8rem clamp(1.5rem, 3vw, 2.5rem);
+    text-align: left; align-items: center;
+    transition: background 0.25s;
+    position: relative; font-family: inherit; cursor: pointer; user-select: none; border: none; color: inherit;
+  }
+  .cs-trigger:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+  .cs-trigger:hover { background: var(--panel-2); }
+  .cs-trigger[aria-expanded="true"] { background: var(--panel-2); }
+  .cs-trigger::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); transform: scaleY(0); transform-origin: top; transition: transform 0.3s; }
+  .cs-trigger:hover::before, .cs-trigger[aria-expanded="true"]::before { transform: scaleY(1); }
+
+  .cs-head { min-width: 0; }
+  .cs-section-tag { font-family: 'Space Mono', monospace; font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.55rem; }
+  .cs-trigger h3 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--white); line-height: 1.2; }
+  .cs-summary { min-width: 0; }
+  .cs-summary p { font-size: 0.9rem; color: var(--slate); line-height: 1.6; }
+  .cs-summary .key-stat { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--amber); margin-top: 0.4rem; }
+  .cs-thumb { width: 100%; height: 104px; object-fit: cover; display: block; border: 1px solid var(--border); align-self: center; transition: transform 0.45s ease, border-color 0.25s; }
+  .cs-trigger:hover .cs-thumb, .cs-trigger[aria-expanded="true"] .cs-thumb { border-color: var(--amber); }
+  .cs-trigger:hover .cs-thumb { transform: scale(1.03); }
+  .cs-thumb-empty { width: 100%; height: 104px; }
+  @media (max-width: 1024px) { .cs-thumb, .cs-thumb-empty { height: 150px; } }
+
+  .cs-toggle { display: inline-flex; align-items: center; gap: 0.6rem; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); border: 1px solid var(--amber); padding: 0.55rem 1.1rem; transition: background 0.2s, color 0.2s; white-space: nowrap; align-self: center; background: none; font: inherit; cursor: pointer; }
+  .cs-trigger:hover .cs-toggle, .cs-trigger[aria-expanded="true"] .cs-toggle { background: var(--amber); color: var(--navy); }
+  .cs-toggle .icon-plus { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; font-size: 0.75rem; font-weight: 700; line-height: 1; transition: transform 0.35s ease; }
+  .cs-trigger[aria-expanded="true"] .cs-toggle .icon-plus { transform: rotate(45deg); }
+  .cs-trigger[aria-expanded="true"] .toggle-collapsed { display: none; }
+  .cs-trigger[aria-expanded="false"] .toggle-expanded { display: none; }
+
+  @media (max-width: 1024px) { .cs-trigger { grid-template-columns: 1fr; gap: 1rem; padding: 1.6rem 1.4rem; } .cs-toggle { justify-self: start; } }
+
+  /* ── ACCORDION DETAIL PANEL ── */
+  .cs-detail { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.35s ease, padding 0.3s ease, border-color 0.3s ease; padding: 0 clamp(1.5rem, 3vw, 2.5rem); background: var(--navy); border-top: 1px solid transparent; }
+  .cs-detail[data-open="true"] { opacity: 1; padding: clamp(1.8rem, 3vw, 2.8rem) clamp(1.5rem, 3vw, 2.5rem); border-top-color: var(--border); }
+
+  /* ── CONTENT COMPONENTS (inside panels) ── */
+  .prose { max-width: 70ch; font-size: clamp(0.92rem, 1.1vw, 1rem); line-height: 1.75; color: var(--slate); }
+  .prose p + p { margin-top: 1rem; }
+  .prose strong { color: var(--white); font-weight: 600; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  @media (max-width: 1024px) { .split { grid-template-columns: 1fr; } }
+
+  .stat-envelope { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 2rem 0; }
+  .stat-cell { background: var(--navy); padding: 1.4rem 1rem; text-align: center; }
+  .stat-num { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(1.3rem, 2vw, 1.8rem); color: var(--amber); line-height: 1; letter-spacing: -0.01em; }
+  .stat-num.sky { color: var(--sky); }
+  .stat-num.white { color: var(--white); }
+  .stat-lbl { margin-top: 0.5rem; font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--slate); letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.4; }
+  @media (max-width: 1024px) { .stat-envelope { grid-template-columns: 1fr 1fr 1fr; } }
+  @media (max-width: 600px)  { .stat-envelope { grid-template-columns: 1fr 1fr; } }
+
+  .data-table-wrap { border: 1px solid var(--border); background: var(--panel); margin: 2rem 0; overflow-x: auto; }
+  table.dt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  table.dt thead tr { background: var(--panel-2); border-bottom: 1px solid var(--border); }
+  table.dt th { padding: 0.85rem 1.2rem; text-align: left; font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--slate-cool); font-weight: 400; white-space: nowrap; }
+  table.dt td { padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); color: var(--slate); vertical-align: top; line-height: 1.5; }
+  table.dt tr:last-child td { border-bottom: none; }
+  table.dt tr.hl td { background: rgba(255,171,64,0.06); color: var(--white); }
+  table.dt tr.hl-sky td { background: rgba(125,211,252,0.05); }
+  table.dt .amber { color: var(--amber); font-weight: 600; }
+  table.dt .sky   { color: var(--sky); }
+  table.dt .white { color: var(--white); font-weight: 500; }
+  table.dt .mono  { font-family: 'Space Mono', monospace; font-size: 0.8rem; }
+
+  .img-frame { position: relative; border: 1px solid var(--border); overflow: hidden; background: var(--panel); margin: 2rem 0; }
+  .img-frame img { width: 100%; display: block; }
+  .img-frame .img-caption { padding: 0.75rem 1rem; border-top: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate-cool); line-height: 1.5; }
+  .img-frame .img-caption span { color: var(--amber); }
+  .img-frame.fig-narrow { max-width: 420px; margin-left: auto; margin-right: auto; }
+
+  .callout { padding: 1.1rem 1.4rem; background: rgba(125,211,252,0.06); border-left: 3px solid var(--sky); font-size: 0.88rem; color: var(--slate); line-height: 1.6; margin: 1.6rem 0; }
+  .callout.amber-callout { background: rgba(255,171,64,0.06); border-left-color: var(--amber); }
+  .callout .k { font-family: 'Space Mono', monospace; font-size: 0.63rem; letter-spacing: 0.16em; color: var(--sky); text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
+  .callout.amber-callout .k { color: var(--amber); }
+  .callout strong { color: var(--white); font-weight: 600; }
+
+  .step-list { margin: 1.6rem 0; }
+  .step-item { display: grid; grid-template-columns: 40px 1fr; gap: 1.4rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border); align-items: start; }
+  .step-item:last-child { border-bottom: none; }
+  .step-n { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--amber); padding-top: 0.1rem; }
+  .step-body strong { display: block; color: var(--white); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .step-body p { font-size: 0.88rem; color: var(--slate); line-height: 1.6; }
+
+  .finding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 1.6rem 0; }
+  .finding-cell { background: var(--panel); padding: 1.8rem 1.6rem; position: relative; transition: background 0.25s; }
+  .finding-cell::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+  .finding-cell:hover::before { transform: scaleX(1); }
+  .finding-cell:hover { background: var(--panel-2); }
+  .finding-cell .fc-tag { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.6rem; }
+  .finding-cell .fc-tag.sky { color: var(--sky); }
+  .finding-cell h4 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--white); margin-bottom: 0.5rem; line-height: 1.25; }
+  .finding-cell p { font-size: 0.84rem; color: var(--slate); line-height: 1.6; }
+  @media (max-width: 700px) { .finding-grid { grid-template-columns: 1fr; } }
+
+  ul.dot-list { list-style: none; margin: 1rem 0; }
+  ul.dot-list li { font-size: 0.9rem; color: var(--slate); padding: 0.4rem 0 0.4rem 1.1rem; position: relative; line-height: 1.5; border-bottom: 1px dashed rgba(125,211,252,0.12); }
+  ul.dot-list li:last-child { border-bottom: none; }
+  ul.dot-list li::before { content: '\25A0'; position: absolute; left: 0; top: 0.52rem; color: var(--amber); font-size: 0.6rem; }
+  ul.dot-list li strong { color: var(--white); font-weight: 600; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--footer-bar); padding: clamp(3rem, 6vw, 5rem) var(--gutter) 0; position: relative; z-index: 1; }
+  .footer-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); padding-bottom: clamp(2.5rem, 5vw, 4rem); border-bottom: 1px solid #222; }
+  .footer-brand .nav-logo { margin-bottom: 1rem; }
+  .footer-brand p { font-size: 0.84rem; color: var(--slate-cool); line-height: 1.6; }
+  footer h6 { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--slate-cool); margin-bottom: 1rem; }
+  footer ul { list-style: none; }
+  footer ul li { padding: 0.3rem 0; }
+  footer ul li a { font-size: 0.83rem; color: var(--slate); transition: color 0.2s; }
+  footer ul li a:hover { color: var(--amber); }
+  .footer-bottom { max-width: 1280px; margin: 0 auto; padding: 1.4rem 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--slate-cool); flex-wrap: wrap; gap: 0.5rem; }
+  .footer-tag { font-family: 'Space Mono', monospace; font-size: 0.68rem; }
+  @media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px)  { .footer-grid { grid-template-columns: 1fr; } }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── Chain of Events timeline ── */
+  .coe { max-width: 1280px; margin: 0 auto; padding: clamp(3rem,6vw,4.5rem) var(--gutter) 0; }
+  .coe .label { color: var(--amber); }
+  .coe h2 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(1.7rem,3.5vw,2.4rem); color: var(--white); letter-spacing: -0.02em; margin: 0.6rem 0 0; }
+  .coe h2 em { font-style: normal; color: var(--amber); }
+  .coe-note { color: var(--slate); font-size: 0.92rem; max-width: 72ch; margin-top: 0.7rem; }
+  .coe-note code { font-family: 'Space Mono', monospace; color: var(--sky); font-size: 0.85em; }
+  .coe-tl { position: relative; margin: 2.2rem 0 0; padding: 0 0 0 2rem; list-style: none; }
+  .coe-tl::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--amber), #FF8C42 45%, #FF5A3C 68%, var(--sky)); }
+  .coe-step { position: relative; margin: 0 0 1.7rem; display: flow-root; }
+  .coe-step::before { content: ''; position: absolute; left: -2rem; top: 5px; width: 13px; height: 13px; border-radius: 50%; background: var(--amber); border: 3px solid var(--navy); box-shadow: 0 0 0 2px var(--amber); }
+  .coe-step.sec::before { background: #FF8C42; box-shadow: 0 0 0 2px #FF8C42; }
+  .coe-step.blast::before { background: #FF5A3C; box-shadow: 0 0 0 2px #FF5A3C; }
+  .coe-step.deb::before { background: var(--sky); box-shadow: 0 0 0 2px var(--sky); }
+  .coe-t { font-family: 'Space Mono', monospace; color: var(--sky); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; }
+  .coe-ttl { font-weight: 700; font-size: 1.05rem; color: var(--white); margin: 0.15rem 0 0.3rem; }
+  .coe-d { margin: 0; color: var(--slate); font-size: 0.92rem; max-width: 70ch; }
+  .coe-cams { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--slate-cool); margin-top: 0.45rem; }
+  .coe-cams b { color: var(--sky-soft); font-weight: 400; }
+  .coe-link { display: inline-block; margin-top: 0.5rem; font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--amber); border-bottom: 1px solid var(--amber); padding-bottom: 2px; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none; }
+  .coe-link:hover { color: var(--amber-hover); border-color: var(--amber-hover); }
+  .coe-interp { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--sky); border-radius: 4px; padding: 1.2rem 1.4rem; margin: 1.9rem 0 0; color: var(--slate); font-size: 0.92rem; }
+  .coe-interp b { color: var(--white); }
+  .coe-thumb { float: right; width: 158px; height: 99px; object-fit: cover; border: 1px solid var(--border); border-radius: 3px; margin: 0.1rem 0 0.7rem 1.3rem; transition: border-color 0.25s, transform 0.3s; }
+  .coe-thumb:hover { border-color: var(--amber); transform: scale(1.02); }
+  @media (max-width: 640px) { .coe-thumb { float: none; display: block; width: 100%; height: 172px; margin: 0 0 0.9rem 0; } }
+
+  /* ── Two-camera cross-validation ── */
+  .xc { max-width: 1280px; margin: 0 auto; padding: clamp(2.5rem,5vw,3.5rem) var(--gutter) 0; }
+  .xc h2 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(1.5rem,3vw,2.1rem); color: var(--white); letter-spacing: -0.02em; margin: 0.6rem 0 0; }
+  .xc h2 em { font-style: normal; color: var(--amber); }
+  .xc-note { color: var(--slate); font-size: 0.92rem; max-width: 72ch; margin-top: 0.7rem; }
+  .xc-wrap { overflow-x: auto; }
+  .xc-table { width: 100%; border-collapse: collapse; margin-top: 1.3rem; font-size: 0.88rem; min-width: 640px; }
+  .xc-table th, .xc-table td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .xc-table th { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sky); }
+  .xc-table td.p { color: var(--white); font-weight: 500; }
+  .xc-table td.v { color: var(--slate); font-family: 'Space Mono', monospace; font-size: 0.8rem; }
+  .xc-ok { color: #5BD89A; font-weight: 600; }
+  .xc-warn { color: var(--amber); font-weight: 600; }
+
+  /* ── Second-camera inline callout ── */
+  .cam2 { background: rgba(125,211,252,0.05); border: 1px solid var(--border-soft); border-left: 3px solid var(--sky); border-radius: 4px; padding: 1.1rem 1.3rem; margin: 1.6rem 0 0; }
+  .cam2 .k { display: block; font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky); margin-bottom: 0.45rem; }
+  .cam2 p { margin: 0; color: var(--slate); font-size: 0.9rem; }
+  .cam2 .v-ok { color: #5BD89A; font-weight: 600; }
+  .cam2 .v-warn { color: var(--amber); font-weight: 600; }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<nav class="site-nav">
+  <a href="../../index.html" class="nav-logo">STAR <span>INDUSTRY</span></a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="../../index.html#offerings">Offerings</a></li>
+      <li><a href="../../index.html#roadmap">Roadmap</a></li>
+      <li><a href="case-study-ng4.html" class="active">Case Studies</a></li>
+      <li><a href="../../about.html">About</a></li>
+      <li><a href="../../index.html#contact">Contact</a></li>
+    </ul>
+    <a href="../../index.html#contact" class="nav-cta">Get in touch</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-breadcrumb reveal">
+      <a href="../../index.html">Home</a> / <a href="case-study-ng4.html">Case Studies</a> / <span>NG-4 Blast &amp; Debris Analysis</span>
+    </div>
+    <div class="hero-eyebrow reveal">
+      <span class="pulse"></span>
+      Forensic Engineering · Open-Source Analysis
+    </div>
+    <h1 class="reveal">New Glenn NG-4 — <em>Blast &amp; Debris</em> Forensic Analysis</h1>
+    <p class="lede reveal">This is our best effort at reconstructing what happened at LC-36, Cape Canaveral on 28 May 2026 — built entirely from public footage, frame by frame, and now cross-checked against a second, independent camera. Two cameras, the same physics: where they agree we hold the result with more confidence; where they diverge, we widen the error bars and say so. No insider data — just geometry, physics, and careful measurement. Every figure here is a considered estimate, not the final word.</p>
+    <div class="hero-meta reveal">
+      <div class="hero-meta-item"><div class="k">Event</div><div class="v">28 May 2026</div></div>
+      <div class="hero-meta-item"><div class="k">Location</div><div class="v">LC-36, CCSFS, Florida</div></div>
+      <div class="hero-meta-item"><div class="k">Propellant</div><div class="v">1,815 t LOX / LCH₄</div></div>
+      <div class="hero-meta-item"><div class="k">Methods</div><div class="v">Sedov-Taylor · Kinney-Graham · Roberts · ballistic tracking</div></div>
+      <div class="hero-meta-item"><div class="k">Sources</div><div class="v">2 independent cameras</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ── RANGE SAFETY SERVICE CTA ── -->
+<div class="cta-banner reveal">
+  <div class="cta-banner-inner">
+    <div>
+      <div class="label label-amber">Range Safety &amp; Licensing</div>
+      <h2>The safety system <em>worked</em></h2>
+      <p>New Glenn's static fire failure released energy equivalent to roughly 200 tonnes of TNT. A 500-metre fireball burned for 35 seconds. And yet: no personnel casualties, no structural damage beyond 375 metres, critical infrastructure intact. That outcome doesn't happen by accident — it is the result of quantity-distance analysis, hazard zoning, and safety case work done long before the vehicle arrived at the pad.</p>
+      <p style="margin-top:0.8rem;">Star Industry has contributed this kind of analysis to real programmes — including work supporting licensing for <strong>Orbex Prime</strong> and <strong>Sutherland Spaceport</strong>. Range safety analysis and safety case development is a service we offer to launch operators, spaceport developers, and regulatory applicants. Get in touch to discuss your programme needs.</p>
+    </div>
+    <div class="cta-banner-actions">
+      <a href="mailto:company@starindustry.space" class="btn btn-primary">company@starindustry.space <span>→</span></a>
+      <a href="../../index.html#contact" class="btn btn-ghost">Contact form <span>→</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ── HYBRID CHAIN OF EVENTS ── -->
+<section class="coe reveal" id="chain-of-events">
+  <span class="label">Reconstructed Sequence · Two Cameras</span>
+  <h2>Chain of <em>events</em></h2>
+  <p class="coe-note">Times are relative to the initiating anomaly: <code>t = 0</code> is the first frame showing flame above the launch platform (the prior frame still shows the water deluge active, ignition imminent). Reconstructed from two independent fixed cameras at broadly similar locations (~9&ndash;9.5&nbsp;km, similar bearing); what differs between them is framing and exposure, not vantage point &mdash; so this is a cross-check on measurement and processing, not a parallax solution. Distances are stated as minima &mdash; motion is assumed perpendicular to each camera's line of sight. Each step links to the detailed section below.</p>
+  <ul class="coe-tl">
+    <li class="coe-step">
+      <img class="coe-thumb" src="coe_1.png" alt="Footage frame at t=0 — flame above the launch platform" loading="lazy">
+      <div class="coe-t">t = 0.00 s</div>
+      <div class="coe-ttl">Initiating anomaly &mdash; flame above the platform</div>
+      <p class="coe-d">The last nominal frame shows the deluge running with ignition imminent; the next shows flame above the platform where none should be. This is the primary failure &mdash; most consistent with an aft-end / engine-bay propellant leak or a BE-4 anomaly during the static-fire test.</p>
+      <button class="coe-link" data-target="height">Origin on the vehicle &rarr;</button>
+    </li>
+    <li class="coe-step sec">
+      <img class="coe-thumb" src="coe_2.png" alt="Footage frame ~+3 s — secondary release at the base" loading="lazy">
+      <div class="coe-t">t &asymp; +2.8 to +3.3 s</div>
+      <div class="coe-ttl">Secondary failure &mdash; bulk propellant release</div>
+      <p class="coe-d">With fire already at the base, a feedline or tank burn-through dumps a large slug of methalox. This is the source recovered by back-propagating the blast front (&asymp;&nbsp;+2.8&nbsp;s) and is directly visible as a new eruption at the base. The propagating front originates here &mdash; at the secondary release, not the slow primary fire.</p>
+      <button class="coe-link" data-target="blast">Blast-front dynamics &rarr;</button>
+    </li>
+    <li class="coe-step blast">
+      <img class="coe-thumb" src="coe_3.png" alt="Footage frame ~+4 s — deflagration front" loading="lazy">
+      <div class="coe-t">t &asymp; +4.2 s</div>
+      <div class="coe-ttl">Deflagration front</div>
+      <p class="coe-d">The released cloud, continuously ignited by the existing fire, burns as a subsonic deflagration. No strong shock forms, so overpressure stays low &mdash; tanks at 170&nbsp;m and the integration facility at 320&nbsp;m survive.</p>
+      <div class="coe-cams">Front speed &mdash; Camera A (fixed): <b>Mach 0.94</b> &nbsp;|&nbsp; Camera B (drone): <b>Mach 0.61</b> &mdash; both subsonic &rarr; deflagration, not detonation.</div>
+      <button class="coe-link" data-target="blast">Blast-front dynamics &rarr;</button>
+    </li>
+    <li class="coe-step blast">
+      <img class="coe-thumb" src="coe_4.png" alt="Footage frame ~+5 s — fireball expansion" loading="lazy">
+      <div class="coe-t">t &asymp; +5 to +6 s</div>
+      <div class="coe-ttl">Fireball expansion</div>
+      <p class="coe-d">Bulk combustion of the released propellant; the fireball grows toward maximum extent.</p>
+      <button class="coe-link" data-target="fireball">Fireball &rarr;</button>
+    </li>
+    <li class="coe-step deb">
+      <img class="coe-thumb" src="coe_5.png" alt="Footage frame ~+9 s — debris in flight" loading="lazy">
+      <div class="coe-t">t &asymp; +7 to +14 s</div>
+      <div class="coe-ttl">Ballistic debris</div>
+      <p class="coe-d">A structural fragment, ejected at ~95&nbsp;m/s near 48&deg;, follows a clean ballistic arc (vertical acceleration &minus;8.3&nbsp;m/s&sup2;, &asymp;&nbsp;g) to an apogee of ~250&nbsp;m.</p>
+      <button class="coe-link" data-target="debris">Debris trajectory &rarr;</button>
+    </li>
+    <li class="coe-step">
+      <img class="coe-thumb" src="coe_6.png" alt="Footage frame ~+17 s — detached fireball at peak" loading="lazy">
+      <div class="coe-t">t &asymp; +14 to +17 s</div>
+      <div class="coe-ttl">Detached buoyant fireball &mdash; peak extent</div>
+      <p class="coe-d">The fireball detaches and rounds into a buoyant sphere, leaving a pool/jet fire at the base. Thermal flux exceeds the ~12.5&nbsp;kW/m&sup2; ignition threshold out to ~900&nbsp;m; vegetation at 450&nbsp;m scorches while structures stand &mdash; thermal-dominated.</p>
+      <div class="coe-cams">Peak diameter &mdash; Camera A: <b>~495 m</b> &nbsp;|&nbsp; Camera B: <b>~415 m</b> (Roberts model 425&nbsp;m). Burn duration was timed off the video, not measured from frames &mdash; treat as indicative.</div>
+      <button class="coe-link" data-target="fireball">Fireball &rarr;</button>
+    </li>
+    <li class="coe-step deb">
+      <img class="coe-thumb" src="coe_7.png" alt="Late footage frame ~+18 s" loading="lazy">
+      <div class="coe-t">t &asymp; +18 s</div>
+      <div class="coe-ttl">Debris impact &mdash; minimum range</div>
+      <p class="coe-d">The tracked fragment lands beyond the 381&nbsp;m hazardous-fragment / HD storage distance but short of the 1,219&nbsp;m emergency-withdrawal distance (DESR&nbsp;6055.09).</p>
+      <div class="coe-cams">Minimum impact range &mdash; Camera A: <b>~700 m</b> &nbsp;|&nbsp; Camera B: <b>~1.0&ndash;1.05 km</b> &mdash; take the larger as the conservative planning minimum.</div>
+      <button class="coe-link" data-target="debris">Debris trajectory &rarr;</button>
+    </li>
+  </ul>
+  <div class="coe-interp"><b>A two-stage, thermally-dominated deflagration.</b> A primary base fire burns through into a secondary bulk propellant release, which deflagrates as a vapour-cloud explosion. Because ignition was continuous, the cloud never accumulated into a detonable charge: the front stayed subsonic, overpressure was modest, and thermal radiation from the several-hundred-metre fireball governed. <b>Two independent camera angles place the event in the same regime</b> &mdash; the disagreements are in magnitudes, not in kind.</div>
+</section>
+
+<!-- ── TWO-CAMERA CROSS-VALIDATION ── -->
+<section class="xc reveal" id="cross-validation">
+  <span class="label">Independent Cross-Check</span>
+  <h2>Where the two cameras <em>agree</em> &mdash; and where they don't</h2>
+  <p class="xc-note">A second, independent camera was run through the same pipeline. Both cameras sat at broadly similar locations and bearings &mdash; they differ in framing and exposure, not vantage point &mdash; so this is a check on measurement and processing rather than a true multi-angle (parallax) solution. Agreement firms up a result; divergence widens its error bars. Below, &ldquo;reinforced&rdquo; means the two solutions land within tolerance; &ldquo;diverges&rdquo; means the figure carries more uncertainty than a single camera would suggest.</p>
+  <div class="xc-wrap">
+  <table class="xc-table">
+    <tr><th>Parameter</th><th>Camera A &middot; fixed (~9 km)</th><th>Camera B &middot; drone (~9.5 km)</th><th>Verdict</th></tr>
+    <tr><td class="p">Regime</td><td class="v">deflagration (R &prop; t&sup1;&#8729;&#8304;)</td><td class="v">deflagration (slope 0.12)</td><td><span class="xc-ok">&#10003; Reinforced</span></td></tr>
+    <tr><td class="p">TNT-equivalent yield</td><td class="v">~210 t (~5%)</td><td class="v">~215 t (~5%)</td><td><span class="xc-ok">&#10003; Reinforced</span></td></tr>
+    <tr><td class="p">Peak front speed</td><td class="v">322 m/s (Mach 0.94)</td><td class="v">210 m/s (Mach 0.61)</td><td><span class="xc-warn">~ Both subsonic; magnitude diverges</span></td></tr>
+    <tr><td class="p">Fireball diameter</td><td class="v">~495 m</td><td class="v">~415 m (Roberts 425)</td><td><span class="xc-warn">&#9651; Diverges &rarr; widen band</span></td></tr>
+    <tr><td class="p">Fireball duration</td><td class="v">~35&ndash;40 s (timed off video)</td><td class="v">~22 s (Roberts model)</td><td><span class="xc-v">&mdash; Not a frame measurement; indicative only</span></td></tr>
+    <tr><td class="p">Origin height</td><td class="v">~18 m (&plusmn;17)</td><td class="v">29 m (&plusmn;15), base initiation</td><td><span class="xc-ok">&#10003; Consistent within error</span></td></tr>
+    <tr><td class="p">Min. debris range</td><td class="v">~700 m</td><td class="v">~1.0&ndash;1.05 km</td><td><span class="xc-warn">&#9651; Diverges &rarr; use larger</span></td></tr>
+    <tr><td class="p">Damage validation (170/320/375/450 m)</td><td class="v">consistent</td><td class="v">consistent</td><td><span class="xc-ok">&#10003; Reinforced</span></td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ── ACCORDION SECTIONS ── -->
+<main>
+<div style="padding: clamp(3rem,6vw,5rem) 0;">
+<div class="cs-sections">
+
+  <!-- 1 · Background & Method -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="method" aria-expanded="false" aria-controls="detail-method">
+      <div class="cs-head">
+        <div class="cs-section-tag">Background &amp; Method</div>
+        <h3>What happened, and how we measured it</h3>
+      </div>
+      <div class="cs-summary">
+        <p>An explosion captured on a fixed camera provides enough information to extract blast physics — if you know the geometry. Four steps, one video.</p>
+      </div>
+      <img class="cs-thumb" src="hybrid_grid.png" alt="Per-frame blast arc grid with fitted circles" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-method" data-open="false">
+      <div class="split">
+        <div class="prose">
+          <p>On 28 May 2026, Blue Origin's New Glenn vehicle — a 98-metre-tall rocket loaded with 1,815 tonnes of liquid oxygen and liquid methane — exploded during a static fire test at Launch Complex 36. Local news station WRAL captured the event on a fixed camera, providing a side-on view from several kilometres away.</p>
+          <p>This analysis uses that footage, supplemented by pre- and post-event Planet Labs satellite imagery and Google Maps measurements, to reconstruct the blast wave, estimate the explosion energy, and determine where on the vehicle the failure originated.</p>
+          <p><strong>No proprietary data, Blue Origin internal documents, or government reports were used.</strong> Every number derives from publicly available sources and first-principles physics.</p>
+          <div class="callout amber-callout" style="margin-top:1.4rem;">
+            <span class="k">Scale calibration</span>
+            The two lightning protection masts flanking the pad are <strong>73 m apart</strong>, spanning 61 pixels in the raw frame — giving <strong>1.197 m/px</strong>. The explosion origin was fixed to the tower midpoint horizontally, and determined from circle-fitting blast arcs across 10 early frames in the vertical direction, arriving at a point <strong>~28 m above pad-ground level</strong> (±17 m).
+          </div>
+        </div>
+        <div>
+          <div class="step-list">
+            <div class="step-item"><div class="step-n">01</div><div class="step-body"><strong>Annotate the shock front</strong><p>The blast arc was traced in 13 unique frames from t = 4.0 to 4.8 s. Where hidden by the fireball, the arc was extrapolated by eye using the known symmetry of an expanding sphere.</p></div></div>
+            <div class="step-item"><div class="step-n">02</div><div class="step-body"><strong>Fit circles, find origin</strong><p>A geometric circle was fitted to each frame's arc. The fitted centres, stable across early frames (std ±17 m), give the explosion origin — constrained to the tower midpoint in x.</p></div></div>
+            <div class="step-item"><div class="step-n">03</div><div class="step-body"><strong>Extract R(t), fit blast physics</strong><p>Radius vs time gives blast front velocity. Its rate of deceleration identifies the blast regime: Sedov-Taylor strong shock (R ∝ t⁰·⁴), acoustic (R ∝ t), or — as seen here — late-stage acoustic decay.</p></div></div>
+            <div class="step-item"><div class="step-n">04</div><div class="step-body"><strong>Cross-check with observed damage</strong><p>Tanks at 170 m (no damage), integration facility at 320 m (no damage), tented structure at 375 m (blast damage), and trees at ~450 m (thermal scorching in satellite imagery) each validate a different part of the model.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="hybrid_grid.png" alt="Per-frame blast arc grid with fitted circles" loading="lazy">
+        <div class="img-caption"><span>Fig 1</span> — Each panel shows a unique video frame (S5–S24), colour-coded blue→red chronologically. The ink-annotated shock front arc, fitted circle, and hybrid origin are shown. The dotted circle is fitted to the raster ink point cloud with the tower midpoint as the x-constraint.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · Blast Dynamics -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="blast" aria-expanded="false" aria-controls="detail-blast">
+      <div class="cs-head">
+        <div class="cs-section-tag">Blast Dynamics</div>
+        <h3>The shock front</h3>
+      </div>
+      <div class="cs-summary">
+        <p>Two-phase subsonic decay, 322 m/s and 274 m/s. The acoustic transition happened before the first frame.</p>
+        <div class="key-stat">R: 202 → 439 m over 0.76 s &nbsp;·&nbsp; Phase 1 r² = 0.973</div>
+      </div>
+      <img class="cs-thumb" src="hybrid_Rt.png" alt="Blast wave radius vs time" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-blast" data-open="false">
+      <div class="stat-envelope" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-cell"><div class="stat-num">322</div><div class="stat-lbl">m/s Phase 1<br>t=4.0–4.4 s<br>Mach 0.94</div></div>
+        <div class="stat-cell"><div class="stat-num">274</div><div class="stat-lbl">m/s Phase 2<br>t=4.6–4.8 s<br>Mach 0.80</div></div>
+        <div class="stat-cell"><div class="stat-num sky">335</div><div class="stat-lbl">m phase kink<br>at t ≈ 4.44 s</div></div>
+        <div class="stat-cell"><div class="stat-num">0.973</div><div class="stat-lbl">r² Phase 1<br>linear fit</div></div>
+      </div>
+      <div class="split">
+        <div class="prose">
+          <p>Both phases are subsonic throughout the measurement window — the blast front was already below the speed of sound at t = 4 s, meaning the acoustic transition occurred before the camera captured anything useful. The Sedov-Taylor strong-shock phase was over well before 4 seconds.</p>
+          <p>The slight kink in R(t) at ~335 m reflects a change in acoustic decay rate as the pressure pulse spreads into an ever-larger volume of air. It is not a Mach 1 crossing — both phases are firmly subsonic.</p>
+          <p>The overall R ∝ t¹·⁰ relationship (rather than R ∝ t⁰·⁴ of Sedov-Taylor) confirms we are observing a <strong>decaying far-field blast</strong>, not the prompt shock of a detonation.</p>
+        </div>
+        <div>
+          <div class="callout amber-callout">
+            <span class="k">Why not Sedov-Taylor?</span>
+            The Sedov-Taylor scaling law — used to estimate nuclear weapon yields from photography — predicts R ∝ t⁰·⁴. Here we see R ∝ t¹·⁰, the acoustic limit. This confirms the strong-shock phase ended before our first frame, which in turn confirms the explosion was a <strong>deflagration</strong>, not a detonation.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="hybrid_Rt.png" alt="R(t) blast wave radius vs time" loading="lazy">
+        <div class="img-caption"><span>Fig 2</span> — Shock front radius R versus time (fixed camera). Phase 1: 322 m/s, Mach 0.94, r² = 0.973. Phase 2: 274 m/s, Mach 0.80, r² = 0.941. Error bars = std of point distances within each fitted circle. Hybrid origin used throughout.</div>
+      </div>
+      <div class="cam2">
+        <span class="k">Both cameras &middot; data overlaid</span>
+        <p>The drone angle traces the front at <b>210 m/s (Mach 0.61)</b> decaying to 16 m/s, with a log&ndash;log R(t) slope of 0.12 &mdash; far below the Sedov&ndash;Taylor 0.4 of a strong shock. The original fixed camera measured a faster front (322 m/s, Mach 0.94). <span class="v-ok">Both remain firmly subsonic</span>, so the deflagration conclusion is reinforced; the absolute front speed carries more uncertainty between the two cameras.</p>
+        <p style="margin-top:0.8rem;"><b>Why the speeds differ.</b> Front velocity is the least robust quantity here &mdash; it is a derivative, recovered by differentiating a noisy radius&ndash;time curve over a front that decelerates sharply in its first instants. Three things plausibly drive the ~Mach 0.3 gap, all tied to the cameras differing in framing and exposure rather than position: (i) <b>exposure</b> &mdash; a brighter or longer exposure records more of the faint, fast leading edge, so the luminous front appears to expand further per frame and reads as a higher velocity; (ii) <b>time-zero alignment</b> &mdash; catching the usable inked frames a fraction of a second earlier samples a faster part of the decay; and (iii) <b>scale calibration</b> &mdash; each camera carries ~&plusmn;8% on its m/px, which maps linearly onto velocity. None of these change the regime: both log&ndash;log slopes sit far below Sedov&ndash;Taylor, so both cameras independently see a deflagration, not a shock.</p>
+        <div class="img-frame" style="margin-top:1rem;">
+          <img src="combined_Rt.png" alt="Blast-front R(t) — both cameras overlaid on one axis" loading="lazy">
+          <div class="img-caption"><span>Both cameras</span> &mdash; Fitted blast-front R(t) for both angles on one axis. Both fronts stay well below Mach&nbsp;1 throughout &mdash; the deflagration regime is shared; only the absolute speed differs. Lines are the published two-phase fits (per-frame scatter was not available to overlay).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · Explosion Height -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="height" aria-expanded="false" aria-controls="detail-height">
+      <div class="cs-head">
+        <div class="cs-section-tag">Explosion Location</div>
+        <h3>~18 m up New Glenn</h3>
+      </div>
+      <div class="cs-summary">
+        <p>The 183 m masts act as a vertical ruler. Correcting for the elevated launch platform, the origin sits at the engine-section / lower-booster interface.</p>
+        <div class="key-stat">~18 m above platform &nbsp;·&nbsp; ~18% of 98 m &nbsp;·&nbsp; ±17 m uncertainty</div>
+      </div>
+      <img class="cs-thumb" src="explosion_height_corrected.png" alt="Explosion height on the New Glenn schematic" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-height" data-open="false">
+      <div class="split">
+        <div class="prose">
+          <p>The lightning protection masts (182.88 m / 600 ft tall) serve as a vertical ruler in the image. At a camera distance of several kilometres, perspective distortion over the vehicle height is less than 1°, so the horizontal pixel scale applies equally vertically.</p>
+          <p>The mast tops appear at y = 660 px. Projecting down using the known mast height gives mast-base ground level at y = 819 px. The explosion origin at y = 794.8 px sits <strong>28 m above mast-base ground</strong>.</p>
+          <p>The launch platform itself is elevated above that reference level — estimated at approximately <strong>~10 m</strong> by comparing mast and platform shadow lengths in Google Maps satellite imagery at the same sun angle. This estimate carries its own uncertainty of similar magnitude, and we treat it as a round-number correction. Subtracting it, the explosion origin sits approximately <strong>~18 m above the launch platform surface</strong> — the true base of New Glenn — with a ±17 m uncertainty.</p>
+          <p>At ~18 m above the vehicle base, the origin straddles the <strong>boundary between the BE-4 engine section (0–15 m) and the base of the lower booster / propellant tank section (15–60 m)</strong>. The wide uncertainty band means no firm distinction between the two is possible, but the central estimate points to the engine/booster interface.</p>
+        </div>
+        <div>
+          <div class="stat-envelope" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="stat-cell"><div class="stat-num">~10<span style="font-size:0.85rem">m</span></div><div class="stat-lbl">Platform elevation<br>(shadow est.)</div></div>
+            <div class="stat-cell"><div class="stat-num">~18<span style="font-size:0.85rem">m</span></div><div class="stat-lbl">Above platform<br>±17 m</div></div>
+            <div class="stat-cell"><div class="stat-num sky">~18<span style="font-size:0.85rem">%</span></div><div class="stat-lbl">Up New Glenn<br>range 1–36%</div></div>
+          </div>
+          <div class="callout amber-callout">
+            <span class="k">Structural context</span>
+            New Glenn first stage: <strong>engines (0–15 m) → lower booster / tanks (15–60 m) → interstage (60–68 m) → upper stage (68–98 m)</strong>. The ~18 m central estimate sits right at the engine-booster interface. The ±17 m uncertainty band spans most of the engine section and the base of the booster.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="combined_origin.png" alt="Explosion-origin estimate on the New Glenn stack — both cameras" loading="lazy">
+        <div class="img-caption"><span>Fig 3</span> — Explosion-origin estimate on the 98 m stack, both cameras. Camera A (fixed): ~18 m above base (±17 m). Camera B (drone): ~29 m (±15 m), marking the luminous-fireball centroid — which sits high because the fireball rises; the initiation itself appears to be at the base. The overlapping bands straddle the engine / lower-booster interface.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 · TNT Equivalence -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="tnt" aria-expanded="false" aria-controls="detail-tnt">
+      <div class="cs-head">
+        <div class="cs-section-tag">TNT Equivalence</div>
+        <h3>4,720 t TNT — theoretically</h3>
+      </div>
+      <div class="cs-summary">
+        <p>1,815 t of propellant gives 19.75 TJ of chemical energy. The measured blast efficiency is ~4–6%, yielding ~210 t TNT equivalent. Licensing standards use 20%.</p>
+        <div class="key-stat">Chemical energy: 19.75 TJ &nbsp;·&nbsp; Measured yield: ~210 t TNT</div>
+      </div>
+      <img class="cs-thumb" src="overpressure_linear_R.png" alt="Overpressure vs distance" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-tnt" data-open="false">
+      <div class="split">
+        <div class="prose">
+          <p>New Glenn carried 395 t of liquid methane (LCH₄) and 1,420 t of liquid oxygen at a mixture ratio of 3.6:1. The lower heating value of methane gives a total chemical energy of <strong>19.75 TJ</strong> — equivalent to 4,720 t of TNT if every molecule reacted perfectly.</p>
+          <p>In practice, an explosion converts only a fraction of its chemical energy into blast wave. This fraction — the <em>blast efficiency</em> — separates a slow fire from a city-levelling detonation. Our measurement is consistent with a blast efficiency of roughly <strong>4–6%</strong>, giving an effective yield of <strong>~210 t TNT</strong> — characteristic of a moderately energetic vapour cloud explosion.</p>
+          <p>It is worth noting that this measured efficiency is considerably lower than values used in regulatory licensing. US DoD and FAA standards for LOX/hydrocarbon propellants at launch pads use <strong>20% TNT equivalence</strong> as the baseline for quantity-distance calculations. For LOX/LNG (methane) specifically, NASA's interim blast model notes the potential for methane-oxygen mixtures to behave as a sensitive high explosive under certain mixing conditions, adding further uncertainty that justifies the conservative regulatory approach. The gap between the measured ~210 t and the licensing basis ~944 t (20% of 4,720 t) is not a discrepancy — it is the difference between what happened in this particular event and the worst-credible-case that must be bounded for public safety.</p>
+        </div>
+        <div>
+          <div class="data-table-wrap">
+            <table class="dt">
+              <thead><tr><th>Scenario</th><th>Efficiency</th><th>Yield</th></tr></thead>
+              <tbody>
+                <tr><td class="white">Poor deflagration</td><td class="mono">1%</td><td class="amber">47 t</td></tr>
+                <tr><td class="white">Typical VCE</td><td class="mono">2%</td><td class="amber">94 t</td></tr>
+                <tr class="hl"><td class="white"><strong>This explosion (est.)</strong></td><td class="mono amber">~4–6%</td><td class="amber"><strong>~210 t</strong></td></tr>
+                <tr><td class="white">Near-DDT transition</td><td class="mono">10%</td><td class="amber">472 t</td></tr>
+                <tr class="hl-sky"><td class="white">FAA / DoD launch pad standard</td><td class="mono sky">20%</td><td class="sky">940 t</td></tr>
+                <tr><td class="white">Detonation (e.g. ANFO)</td><td class="mono">~40%</td><td class="amber">1,888 t</td></tr>
+                <tr class="hl-sky"><td class="white">Some solid / confined systems</td><td class="mono sky">100%</td><td class="sky">4,720 t</td></tr>
+                <tr><td class="slate">Beirut 2020 (ref.)</td><td class="mono sky">—</td><td class="sky">~1,100 t</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <span class="k">Regulatory context</span>
+            US DoD and FAA standards for LOX/hydrocarbon launch pads require <strong>20% TNT equivalence</strong> for quantity-distance calculations — ~10× more conservative than the ~4–6% measured here. This is the worst-credible-case that must be bounded to protect the public, not a prediction of what will happen.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="overpressure_linear_R.png" alt="Overpressure vs distance" loading="lazy">
+        <div class="img-caption"><span>Fig 4</span> — Peak overpressure versus standoff distance (linear R, log P). Five yield scenarios spanning 2–100% blast efficiency. Green band = measured range. Damage thresholds from NFPA / UFC 3-340-02.</div>
+      </div>
+      <div class="cam2">
+        <span class="k">Both cameras &middot; data overlaid</span>
+        <p>The drone camera independently returns <b>~215 t TNT-equivalent (~5% VCE efficiency)</b>, against ~210 t from the fixed camera (100% chemical yield &asymp; 4,340 t vs 4,720 t). <span class="v-ok">Strongly reinforced</span> &mdash; two independent geometries land within ~2% on yield, and both sit far below the regulatory detonation curves.</p>
+        <div class="img-frame" style="margin-top:1rem;">
+          <img src="combined_overpressure.png" alt="Overpressure vs distance — both cameras" loading="lazy">
+          <div class="img-caption"><span>Both cameras</span> &mdash; Kinney&ndash;Graham peak-overpressure curves for the two measured yields (200&nbsp;t / 215&nbsp;t) &mdash; they fall within ~2% of each other. Observed damage at 170&ndash;450&nbsp;m lies orders of magnitude below even these detonation curves, confirming a deflagration. Dashed grey: 20% and 100% planning bounds.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · Fireball -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="fireball" aria-expanded="false" aria-controls="detail-fireball">
+      <div class="cs-head">
+        <div class="cs-section-tag">Fireball</div>
+        <h3>~495 m diameter</h3>
+      </div>
+      <div class="cs-summary">
+        <p>The fireball diameter was measured directly from the video. Duration was only timed by eye off the live footage — indicative, not a frame measurement. The diameter brackets standard empirical correlations, despite being 400× beyond their calibration range.</p>
+      </div>
+      <img class="cs-thumb" src="slide26_fireball.png" alt="Fireball at maximum extent" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-fireball" data-open="false">
+      <div class="split">
+        <div class="prose">
+          <p>The explosion produced a fireball that grew to approximately <strong>~495 m diameter</strong> before rising and dispersing, burning for a duration <strong>timed by eye off the live video at ~35–40 s</strong>. That duration is indicative only — neither set of screengrabs spans the full burn, so it is not a photogrammetric measurement (for comparison, the Roberts correlation predicts ~22 s). The diameter, by contrast, was measured from the video frame at maximum extent: the left edge extends off-screen, so the right-side half-width from the origin was doubled assuming symmetry.</p>
+          <p>These observed values bracket the predictions of standard fireball correlations — Roberts (1982), Moorhouse &amp; Pritchard, and TNO Yellow Book — all developed for hydrocarbon releases of roughly 1–10 tonnes. Extrapolating nearly 400× beyond their calibration range, the agreement within 15–20% is notable.</p>
+          <p>The slightly larger measured diameter likely reflects the LOX co-oxidiser providing additional internal oxygen, making combustion more complete — and the fireball marginally bigger and longer-burning — than a pure hydrocarbon release would produce.</p>
+        </div>
+        <div>
+          <div class="data-table-wrap">
+            <table class="dt">
+              <thead><tr><th>Correlation</th><th>Diameter</th><th>Duration</th></tr></thead>
+              <tbody>
+                <tr><td class="white">Roberts (1982)</td><td class="amber">425 m</td><td class="sky">33 s</td></tr>
+                <tr><td class="white">Moorhouse &amp; Pritchard</td><td class="amber">360 m</td><td class="sky">46 s</td></tr>
+                <tr><td class="white">TNO Yellow Book</td><td class="amber">450 m</td><td class="sky">30 s</td></tr>
+                <tr class="hl"><td class="white"><strong>Measured (video)</strong></td><td class="amber"><strong>~495 m</strong></td><td class="sky"><strong>~35–40 s*</strong></td></tr>
+              </tbody>
+            </table>
+            <p style="font-family:'Space Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; color:var(--slate-cool); margin-top:0.5rem;">* Duration timed by eye off the live video — neither camera's frame set spans the full burn, so this is indicative only, not a photogrammetric measurement.</p>
+          </div>
+          <div class="callout">
+            <span class="k">Calibration note</span>
+            All correlations calibrated on 1–10 t hydrocarbon releases. New Glenn carried ~395 t of LCH₄. Agreement within 15–20% at 400× the calibration mass validates these correlations for order-of-magnitude thermal hazard estimation at this scale.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="slide26_fireball.png" alt="Fireball at maximum extent" loading="lazy">
+        <div class="img-caption"><span>Fig 5</span> — The fireball at or near maximum extent from the WRAL footage. The left edge extends beyond the frame; assuming symmetry about the explosion origin (x = 146.5 px), the measured right half-width gives a total diameter of ~495 m. Scale: 61 px = 73 m.</div>
+      </div>
+      <div class="cam2">
+        <span class="k">Second camera &middot; drone footage (~9.5 km)</span>
+        <p>Measured on the detached, near-spherical fireballs, the drone camera gives a <b>~415 m diameter</b> &mdash; within ~2% of the Roberts model (425 m); the fixed camera measured ~495 m. <span class="v-warn">The diameters diverge here</span>, so the size band should be widened, with the drone figure the closer match to first-principles correlations. <b>On duration, neither camera is authoritative:</b> neither set of screengrabs spans the full burn, so the ~22 s is the Roberts-model prediction and the ~35&ndash;40 s was timed by eye off the live video &mdash; both are indicative, not photogrammetric measurements.</p>
+        <div class="img-frame" style="margin-top:1rem;">
+          <img src="cam2_fireball.png" alt="Maximum detached fireball extent &asymp; 415 m (drone camera)." loading="lazy">
+          <div class="img-caption"><span>Cam B</span> &mdash; Maximum detached fireball extent &asymp; 415 m (drone camera).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 · Blast vs Thermal -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="thermal" aria-expanded="false" aria-controls="detail-thermal">
+      <div class="cs-head">
+        <div class="cs-section-tag">Damage Pattern</div>
+        <h3>Blast vs thermal hazard</h3>
+      </div>
+      <div class="cs-summary">
+        <p>Beyond ~300–400 m, thermal radiation from the fireball was the dominant hazard — not the pressure wave. Trees scorched at 450 m; the integration facility at 320 m stood untouched.</p>
+      </div>
+      <img class="cs-thumb" src="blast_vs_thermal.png" alt="Blast overpressure vs thermal flux" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-thermal" data-open="false">
+      <div class="data-table-wrap">
+        <table class="dt">
+          <thead><tr><th>Distance</th><th>Structure</th><th>Outcome</th><th>ΔP (200 t)</th><th>Thermal flux</th><th>Dominant hazard</th></tr></thead>
+          <tbody>
+            <tr class="hl-sky"><td class="sky mono">170 m</td><td class="white">Propellant / pressurant tanks</td><td class="sky">✓ No damage</td><td class="mono">0.87 kPa</td><td class="mono">250 kW/m²</td><td class="slate">— (steel: threshold &gt;10,000 kPa)</td></tr>
+            <tr class="hl-sky"><td class="sky mono">320 m</td><td class="white">Integration facility</td><td class="sky">✓ No damage</td><td class="mono">0.25 kPa</td><td class="mono">110 kW/m²</td><td class="slate">— (RC concrete: robust to both)</td></tr>
+            <tr class="hl"><td class="amber mono">375 m</td><td class="white">Tented structure</td><td class="amber">⚠ Blast damage</td><td class="mono">0.19 kPa</td><td class="mono">80 kW/m²</td><td class="amber">Blast (fabric fails at ~0.1–0.3 kPa)</td></tr>
+            <tr class="hl"><td class="amber mono">450 m</td><td class="white">Trees (satellite imagery)</td><td class="amber">🔥 Thermal scorching</td><td class="mono">0.14 kPa</td><td class="mono">56 kW/m²</td><td class="amber">Thermal (veg. ignition ~12 kW/m²)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split">
+        <div class="prose">
+          <p>The survival of steel pressure tanks at 170 m while a tented structure at 375 m was damaged resolves through material thresholds: steel pressure vessels survive tens of thousands of kPa, while tented fabric fails at as little as 0.1–0.3 kPa. Both outcomes are consistent with the same blast yield.</p>
+          <p>More revealing is the tree scorching at 450 m. The blast overpressure there is 0.14 kPa — below any structural threshold. But the thermal flux from a ~500 m fireball burning for 35 seconds is approximately <strong>56 kW/m²</strong> at that distance — well above the ~12 kW/m² threshold for vegetation ignition.</p>
+          <p><strong>Beyond ~300–400 m, thermal radiation was the dominant hazard.</strong> This is the defining signature of a large VCE / deflagration. A detonation shows exactly the inverse relationship.</p>
+        </div>
+        <div>
+          <div class="callout amber-callout">
+            <span class="k">Energy partitioning</span>
+            With ~5% blast efficiency, approximately <strong>1 TJ</strong> went into the shock wave. But roughly 35% of the total chemical energy — around <strong>7 TJ</strong> — was radiated as heat from the fireball. That is seven times more thermal energy than blast energy. Conventional high explosives convert ~40% to blast and ~10% to heat: the exact opposite ratio.
+          </div>
+          <div class="callout" style="margin-top:1rem;">
+            <span class="k">Thermal radius</span>
+            Predicted vegetation ignition radius (Roberts model): <strong>~950 m</strong>. Observed: <strong>~450 m</strong>. The discrepancy likely reflects incomplete fuel participation — not all propellant joined the fireball simultaneously.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="blast_vs_thermal.png" alt="Blast overpressure vs thermal flux" loading="lazy">
+        <div class="img-caption"><span>Fig 6</span> — Blast overpressure (left axis) and thermal flux (right axis) versus standoff distance. Observed damage markers on both axes. Blast model: Kinney-Graham. Thermal model: Roberts (1982) fireball correlation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 · Debris & Fragmentation -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="debris" aria-expanded="false" aria-controls="detail-debris">
+      <div class="cs-head">
+        <div class="cs-section-tag">Debris &amp; Fragmentation</div>
+        <h3>A fragment that flew ~700 m</h3>
+      </div>
+      <div class="cs-summary">
+        <p>The blast and fireball were not the only far-reaching hazards. A single tracked fragment was ejected at ~85 m/s, reached ~360 m altitude, and is projected to have landed roughly 650–770 m downrange.</p>
+        <div class="key-stat">8 frames · 1 s apart · impact ≈ 650–770 m</div>
+      </div>
+      <img class="cs-thumb" src="debris_trajectory.png" alt="Debris fragment trajectory" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-debris" data-open="false">
+      <div class="stat-envelope" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-cell"><div class="stat-num">~85</div><div class="stat-lbl">m/s ejection<br>(lower bound)<br>at ~68° elevation</div></div>
+        <div class="stat-cell"><div class="stat-num sky">~360</div><div class="stat-lbl">m apogee<br>~10 s after event<br>~310 m downrange</div></div>
+        <div class="stat-cell"><div class="stat-num">650–770</div><div class="stat-lbl">m impact range<br>incl. scale<br>uncertainty</div></div>
+        <div class="stat-cell"><div class="stat-num">2.5%</div><div class="stat-lbl">landmark ratio<br>error (geometry<br>validated)</div></div>
+      </div>
+      <div class="split">
+        <div class="prose">
+          <p>Alongside the blast and thermal hazards, the footage shows numerous incandescent fragments thrown clear of the fireball. One bright fragment was tracked across <strong>8 consecutive frames, one second apart</strong>, to reconstruct its trajectory and estimate where it came down.</p>
+          <p>The scale is anchored to the <strong>73 m</strong> separation of the two lightning masts (measured from satellite imagery via two independent workflows). This horizontal baseline is chosen over the towers' height — it needs no estimate of ground level or of the tower tops, which bloom into the fireball. To pin the scale and check the camera geometry, three landmarks at known coordinates (the masts, a water tower, and the Cape Canaveral lighthouse) were measured in a clearer frame: the observed pixel-separation ratio (lighthouse-to-tower vs water-tower-to-tower) matched the prediction from their surveyed positions to <strong>2.5%</strong>, confirming the camera location (~9.1 km SSW) and that the view is within ~6° of broadside to the mast line — so the parallax (foreshortening) correction is negligible (~0.99) and the on-screen mast gap is the full 73 m. Fragment positions were then measured against this validated scale; the integration facility base sets the altitude datum.</p>
+          <p>The eight points trace a clean ballistic arc — apogee <strong>~360 m</strong>, reached roughly 10 s after the event (video t ≈ 24 s; event onset taken as t ≈ 14 s). The per-second vertical drop accelerates consistent with gravity, confirming ballistic motion. Projecting the descending limb forward to the ground gives an impact of ~650–770 m: the spread combines the drag-vs-no-drag fall with the residual (few-pixel) scale uncertainty.</p>
+          <p><strong>Two independent checks support the reconstruction.</strong> First, the landmark geometry: surveyed coordinates predict the on-screen spacing of three reference points to 2.5%. Second, the back-extrapolation: tracing the fitted arc backwards returns it to the launch vehicle near the mast midpoint. The measured arc and the geodetically-anchored scale converge on an origin at the pad, where the rocket stood.</p>
+        </div>
+        <div>
+          <div class="step-list">
+            <div class="step-item"><div class="step-n">01</div><div class="step-body"><strong>Track the fragment</strong><p>One bright fragment located in 8 frames, 1 s apart, against the WRAL footage. Position read in each frame relative to fixed pad structures.</p></div></div>
+            <div class="step-item"><div class="step-n">02</div><div class="step-body"><strong>Scale &amp; datum</strong><p>73 m mast separation (satellite-confirmed, geodetically cross-checked to 2.5%) sets the horizontal metres-per-pixel; integration facility base sets the altitude datum.</p></div></div>
+            <div class="step-item"><div class="step-n">03</div><div class="step-body"><strong>Fit the arc</strong><p>Altitude vs downrange distance fits a parabola. Per-second vertical drop accelerates consistent with gravity — confirming ballistic motion.</p></div></div>
+            <div class="step-item"><div class="step-n">04</div><div class="step-body"><strong>Project &amp; back-trace</strong><p>Forward to impact (drag and no-drag bracket); backward to origin as an independent check — the arc returns to the launch vehicle.</p></div></div>
+          </div>
+          <div class="callout amber-callout" style="margin-top:1.4rem;">
+            <span class="k">Ejection velocity</span>
+            From the apogee height (energy method) and the ~10 s rise time (event onset at t ≈ 14 s), the vertical launch component is ~80 m/s, for a total ejection speed of <strong>~85 m/s at ~68° above horizontal</strong>. This is a <strong>lower bound</strong> — drag during the climb means the true value is somewhat higher.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="debris_scale.png" alt="Scale reference: lightning towers and integration facility" loading="lazy">
+        <div class="img-caption"><span>Fig 7</span> — Scale reference, pre-fireball frame. The two lightning masts (73 m apart, satellite-confirmed) provide the horizontal scale; the integration facility base sets the altitude datum. Three surveyed landmarks (masts, water tower, lighthouse) cross-check the scale and camera geometry to 2.5%.</div>
+      </div>
+      <div class="data-table-wrap">
+        <table class="dt">
+          <thead><tr><th>Reference distance (DESR 6055.09)</th><th>Value</th><th>Fragment vs reference</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td class="white">Default storage hazardous fragment distance (HFD)</td><td class="amber mono">381 m (1,250 ft)</td><td class="amber">Fragment ~1.7–2.0× beyond</td></tr>
+            <tr class="hl"><td class="white">Estimated fragment impact</td><td class="amber mono">650–770 m</td><td class="amber">— (this analysis)</td></tr>
+            <tr class="hl-sky"><td class="white">Emergency withdrawal — facilities</td><td class="sky mono">1,219 m</td><td class="slate">Fragment falls short</td></tr>
+            <tr class="hl-sky"><td class="white">Emergency withdrawal — railcars</td><td class="sky mono">1,524 m</td><td class="slate">Fragment falls short</td></tr>
+            <tr class="hl-sky"><td class="white">Robust-munition maximum fragment distance (MFD)</td><td class="sky mono">2,251 m (7,385 ft)</td><td class="slate">Well within</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split">
+        <div class="prose">
+          <p>Placing the result against US DoD explosive-safety separation distances (DESR 6055.09) is instructive. The estimated impact at <strong>~650–770 m</strong> is roughly <strong>1.7–2.0× the default storage hazardous fragment distance</strong> of 381 m. It falls within the emergency-withdrawal distances and well within the maximum-fragment-distance figures, so it sits comfortably inside the site's wider explosive perimeter.</p>
+          <p>The point that has always quietly nagged at me: the standard hazardous fragment distance is treated as effectively <strong>bounded</strong> above a certain net explosive weight. Yet here is a single fragment, from a vehicle far in excess of that quantity, landing at up to roughly twice that bound. Containment still held — it stays well within the site's wider explosive perimeter, so this is not a safety finding. But it is a tangible reminder that the bounded-distance assumption and the physics of a very large energetic event do not sit together quite as tightly as the tidy number implies.</p>
+        </div>
+        <div>
+          <div class="callout">
+            <span class="k">Why this matters</span>
+            Fragmentation is the third hazard mode alongside blast overpressure and thermal radiation. Unlike those two — which decay smoothly with distance — a single energetic fragment can deposit its hazard at a discrete point far outside the blast and thermal contours, as this one did.
+          </div>
+          <div class="callout amber-callout" style="margin-top:1rem;">
+            <span class="k">Caveats</span>
+            Every distance is a <strong>minimum</strong>: the analysis assumes the fragment travelled perpendicular to the camera line of sight. At the ~9.1 km camera range this depth ambiguity is small (a few percent), but it is a contributor to the residual uncertainty, captured in the 650–770 m band. It is also a <strong>single</strong> fragment, not the full debris field.
+          </div>
+        </div>
+      </div>
+      <div class="img-frame">
+        <img src="debris_trajectory.png" alt="Debris fragment trajectory with DESR reference distances" loading="lazy">
+        <div class="img-caption"><span>Fig 8</span> — Reconstructed fragment trajectory (t = 0 at event onset), scaled to the 73 m mast separation (geodetically validated to 2.5%; parallax negligible). Orange: parabola fitted to the 8 measured points; purple: extrapolated arc (ascending limb and no-drag descent); blue: drag-projected fall. Shaded band: impact range (650–770 m) combining drag and residual scale uncertainty. Red vector: ejection velocity. Dotted: DESR 6055.09 storage HFD (381 m). The fitted arc back-extrapolates to the vehicle.</div>
+      </div>
+      <div class="cam2">
+        <span class="k">Both cameras &middot; data overlaid</span>
+        <p>Tracking a fragment through zoom-corrected frames, the drone camera gives a <b>minimum impact range of ~1.0&ndash;1.05 km</b> (ejection ~95 m/s @ 48&deg;, apogee ~250 m, vertical acceleration &minus;8.3 m/s&sup2; &asymp; g) &mdash; about 2.6&times; the 381 m DESR&nbsp;6055.09 hazardous-fragment distance, but short of the 1,219 m emergency-withdrawal distance. The fixed camera tracked a fragment to ~700 m. <span class="v-warn">These diverge</span> &mdash; most likely because each camera tracked a different fragment (see below).</p>
+        <p style="margin-top:0.8rem;"><b>Why they differ.</b> With the per-frame tracks in hand, <b>both arcs are internally consistent parabolas</b> &mdash; so this is not one camera failing to close. The fixed camera tracked a steeper, slower fragment (ejection ~85 m/s at ~68&deg;, apogee ~364 m) landing near ~700 m; the drone tracked a shallower, faster one (~95 m/s at ~48&deg;, apogee ~250 m, vertical deceleration &minus;8.3 m/s&sup2; &asymp; g) carrying to ~1.0&ndash;1.05 km. Those launch geometries are too different to be the same object &mdash; and with the fixed camera&rsquo;s coarse 1-second frame interval and a different scale calibration (1.62 m/px vs 0.88 m/px), the two almost certainly tracked <b>different fragments</b>. <span class="v-ok">For siting, the governing number is the larger range &mdash; take ~1 km as the minimum.</span></p>
+        <div class="img-frame" style="margin-top:1rem;">
+          <img src="combined_debris.png" alt="Debris fragment trajectory — both cameras, measured tracks + ballistic fits" loading="lazy">
+          <div class="img-caption"><span>Both cameras</span> &mdash; Measured per-frame tracks (★ = apogee) and fitted ballistic arcs. Steeper fixed-camera fragment (apogee ~364 m) lands ~700 m; shallower drone fragment (apogee ~250 m) carries to ~1.0&ndash;1.05 km &mdash; almost certainly different fragments. Dotted line: DESR 6055.09 hazardous-fragment distance (381 m).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 · Classification & Summary -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="summary" aria-expanded="false" aria-controls="detail-summary">
+      <div class="cs-head">
+        <div class="cs-section-tag">Classification &amp; Summary</div>
+        <h3>A deflagration, not a detonation</h3>
+      </div>
+      <div class="cs-summary">
+        <p>Three independent lines of evidence converge on a Vapour Cloud Explosion — subsonic blast speed, ~5% efficiency, and thermal hazard exceeding blast hazard at distance.</p>
+        <div class="key-stat">~210 t TNT · 322 m/s · ~495 m fireball · ~18 m AGL origin</div>
+      </div>
+      <img class="cs-thumb" src="full_analysis.png" alt="Six-panel complete analysis" loading="lazy">
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-summary" data-open="false">
+      <div class="finding-grid">
+        <div class="finding-cell">
+          <div class="fc-tag">Deflagration — what happened</div>
+          <h4>Subsonic flame propagation</h4>
+          <p>Combustion front travels at subsonic speed through the vapour cloud, building pressure progressively. Blast efficiency ~4–6%. Large, long-burning fireball. Thermal hazard extends further than structural blast damage.</p>
+        </div>
+        <div class="finding-cell">
+          <div class="fc-tag sky">Detonation — what didn't happen</div>
+          <h4>Supersonic shock initiation</h4>
+          <p>A supersonic shock wave initiates combustion in microseconds. Blast efficiency 30–50%. Compact, brief fireball. Structural blast damage dominates at distance. Characteristic of confined high explosives or deliberately initiated events (e.g. Beirut 2020).</p>
+        </div>
+      </div>
+      <ul class="dot-list">
+        <li><strong>Blast speed was subsonic from the first frame (Mach 0.94 at t = 4 s).</strong> Detonation-driven blast waves are supersonic for far longer and at greater radii.</li>
+        <li><strong>Blast efficiency of ~5%</strong> is typical of unconfined vapour cloud explosions. Detonations achieve 30–40%.</li>
+        <li><strong>Thermal damage extends further than structural blast damage</strong> — trees scorched at 450 m while the integration facility at 320 m was undamaged.</li>
+        <li><strong>Fireball diameter (~495 m)</strong> consistent with large hydrocarbon fireball correlations, not a compact detonation event (duration ~35–40 s timed by eye — indicative only).</li>
+        <li><strong>Physically expected:</strong> cryogenic LCH₄/LOX requires controlled vaporisation and mixing to detonate. An accidental release is extremely unlikely to achieve detonation conditions.</li>
+      </ul>
+      <div class="img-frame">
+        <img src="full_analysis.png" alt="Six-panel complete analysis" loading="lazy">
+        <div class="img-caption"><span>Fig 9</span> — Complete six-panel analysis: R(t) with two-phase fits; log-log regime identification; overpressure vs distance; New Glenn height schematic; TNT equivalence table; analysis summary.</div>
+      </div>
+      <div class="cam2">
+        <span class="k">Second camera &middot; drone footage (~9.5 km)</span>
+        <p>Both reconstructions converge on the same regime: a two-stage, thermally-dominated vapour-cloud deflagration. <span class="v-ok">The headline call is robust across two independent cameras</span> &mdash; the differences are confined to specific magnitudes (fireball size/duration, front speed, debris range), which the cross-validation table above flags explicitly.</p>
+        <div class="img-frame" style="margin-top:1rem;">
+          <img src="cam2_summary.png" alt="Six-panel summary from the independent drone-camera reconstruction." loading="lazy">
+          <div class="img-caption"><span>Cam B</span> &mdash; Six-panel summary from the independent drone-camera reconstruction.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 · Methods & Caveats -->
+  <div class="cs-item">
+    <button class="cs-trigger" data-section="methods" aria-expanded="false" aria-controls="detail-methods">
+      <div class="cs-head">
+        <div class="cs-section-tag">Methods &amp; Caveats</div>
+        <h3>How this was done, and what we don't know</h3>
+      </div>
+      <div class="cs-summary">
+        <p>All open-source data. Kinney-Graham, Sedov-Taylor, Roberts, and circle-fitting. Key uncertainties: ±17 m on origin height, factor 2–3 on blast yield.</p>
+      </div>
+      <span class="cs-thumb-empty" aria-hidden="true"></span>
+      <span class="cs-toggle"><span class="icon-plus">+</span><span class="toggle-collapsed">Learn more</span><span class="toggle-expanded">Show less</span></span>
+    </button>
+    <div class="cs-detail" id="detail-methods" data-open="false">
+      <div class="split">
+        <div>
+          <div class="callout">
+            <span class="k">Physical models used</span>
+            <ul class="dot-list" style="margin:0.6rem 0 0;">
+              <li>Sedov-Taylor blast scaling (1950)</li>
+              <li>Kinney-Graham overpressure model (1985)</li>
+              <li>Hopkinson-Cranz scaled distance</li>
+              <li>Rankine-Hugoniot shock relations</li>
+              <li>Roberts fireball correlation (1982)</li>
+              <li>TNO Yellow Book fireball model</li>
+              <li>Geometric circle fitting (orthogonal-distance least squares)</li>
+            </ul>
+          </div>
+          <div class="callout amber-callout" style="margin-top:1rem;">
+            <span class="k">Data sources (all open)</span>
+            <ul class="dot-list" style="margin:0.6rem 0 0;">
+              <li>WRAL News camera footage (25 fps, YouTube)</li>
+              <li>Planet Labs satellite imagery (pre/post event)</li>
+              <li>Google Maps satellite view (structure distances, shadow measurements)</li>
+              <li>Blue Origin public specifications (propellant mass)</li>
+              <li>NFPA / SFPE damage threshold tables</li>
+              <li>UFC 3-340-02 blast effects on structures</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <ul class="dot-list">
+            <li><strong>Camera geometry.</strong> All measurements assume the WRAL camera is viewing roughly horizontally. An upward tilt introduces systematic error in the height estimate; at several km distance this is likely small but unquantified.</li>
+            <li><strong>Scale calibration.</strong> The 73 m mast separation was confirmed from satellite imagery. Any error propagates directly into all distance and size estimates.</li>
+            <li><strong>Blast yield.</strong> The ~210 t TNT estimate carries at least a factor of 2–3 uncertainty. We are in the acoustic regime where simplifying assumptions break down.</li>
+            <li><strong>Platform height.</strong> The ~10 m platform elevation estimate carries uncertainty comparable to the figure itself; the shadow measurements that produce it are approximate.</li>
+            <li><strong>Fireball correlations.</strong> Roberts, Moorhouse, and TNO were all calibrated at 1–10 t scale. Extrapolating 400× introduces significant uncertainty.</li>
+            <li><strong>Fireball symmetry.</strong> The diameter assumes symmetry about the origin. The fireball rose and elongated; the video measurement is a cross-section at one moment.</li>
+          </ul>
+          <p class="prose" style="margin-top:1rem; font-size:0.82rem;">All analysis is based on publicly available information only. No proprietary data, Blue Origin internal documents, or government reports were used. This is a forensic estimate, not an official investigation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- cs-sections -->
+</div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">STAR <span>INDUSTRY</span></div>
+      <p>A European engineering company building the systems that move beyond LEO.</p>
+    </div>
+    <div>
+      <h6>Offerings</h6>
+      <ul>
+        <li><a href="../../index.html#offerings">Tier 1 · Services</a></li>
+        <li><a href="../../index.html#offerings">Tier 2 · Products</a></li>
+        <li><a href="../../index.html#offerings">Tier 3 · Vehicles</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>Company</h6>
+      <ul>
+        <li><a href="../../about.html">About / Team</a></li>
+        <li><a href="../../index.html#roadmap">Roadmap</a></li>
+        <li><a href="../../index.html#contact">Contact</a></li>
+        <li><a href="mailto:company@starindustry.space">company@starindustry.space</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>Case Studies</h6>
+      <ul>
+        <li><a href="case-study-ng4.html">NG-4 Blast &amp; Debris Analysis</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Star Industry Ltd · Company No. 17048178 · Forres, Inverness, UK</span>
+    <span class="footer-tag">// Engineering the in-space economy</span>
+  </div>
+</footer>
+
+<script>
+/* Starfield */
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], shooters = [];
+  const AMBER='rgba(255,171,64,', SKY='rgba(125,211,252,', WHITE='rgba(255,255,255,';
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; }
+  function rb(a,b){ return a+Math.random()*(b-a); }
+  function makeStar(){ const r=Math.random(); const color=r<0.05?AMBER:r<0.12?SKY:WHITE; return {x:Math.random()*W,y:Math.random()*H,r:rb(0.3,1.3),alpha:rb(0.2,0.85),drift:rb(-0.008,0.008),twinkleSpeed:rb(0.003,0.012),twinkleDir:Math.random()<0.5?1:-1,color}; }
+  function initStars(){ stars=Array.from({length:460},makeStar); }
+  function makeShooter(){ const angle=rb(200,240)*Math.PI/180; const speed=rb(6,14); const r=Math.random(); const color=r<0.35?AMBER:r<0.55?SKY:WHITE; return {x:rb(W*0.3,W),y:rb(0,H*0.5),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,alpha:1,fade:rb(0.012,0.022),color,trail:[]}; }
+  function scheduleShooter(){ setTimeout(()=>{ if(!document.hidden) shooters.push(makeShooter()); scheduleShooter(); },rb(28000,80000)); }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{ s.alpha+=s.twinkleSpeed*s.twinkleDir; if(s.alpha>0.92||s.alpha<0.1) s.twinkleDir*=-1; s.x+=s.drift; if(s.x<0)s.x=W; if(s.x>W)s.x=0; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=s.color+s.alpha.toFixed(2)+')'; ctx.fill(); });
+    shooters=shooters.filter(s=>s.alpha>0);
+    shooters.forEach(s=>{ s.trail.push({x:s.x,y:s.y}); if(s.trail.length>24)s.trail.shift(); s.x+=s.vx; s.y+=s.vy; s.alpha-=s.fade; if(s.trail.length>1){ const t=s.trail[0]; const g=ctx.createLinearGradient(t.x,t.y,s.x,s.y); g.addColorStop(0,s.color+'0)'); g.addColorStop(0.6,s.color+(s.alpha*0.4).toFixed(2)+')'); g.addColorStop(1,s.color+s.alpha.toFixed(2)+')'); ctx.beginPath(); ctx.moveTo(t.x,t.y); s.trail.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(s.x,s.y); ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke(); } ctx.beginPath(); ctx.arc(s.x,s.y,1.5,0,Math.PI*2); ctx.fillStyle=s.color+s.alpha.toFixed(2)+')'; ctx.fill(); });
+    requestAnimationFrame(draw);
+  }
+  addEventListener('resize',()=>{ resize(); initStars(); });
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) shooters.length=0; });
+  resize(); initStars(); scheduleShooter(); draw();
+})();
+
+/* Accordion — same pattern as index.html */
+(function() {
+  const triggers = document.querySelectorAll('.cs-trigger[data-section]');
+
+  function setOpen(panel, open) {
+    if (open) {
+      panel.dataset.open = 'true';
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      const onEnd = e => {
+        if (e.propertyName !== 'max-height') return;
+        if (panel.dataset.open === 'true') panel.style.maxHeight = '8000px';
+        panel.removeEventListener('transitionend', onEnd);
+      };
+      panel.addEventListener('transitionend', onEnd);
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      void panel.offsetHeight;
+      panel.dataset.open = 'false';
+      panel.style.maxHeight = '0px';
+    }
+  }
+
+  function snapClose(panel) {
+    if (!panel || panel.dataset.open !== 'true') return;
+    const prev = panel.style.transition;
+    panel.style.transition = 'none';
+    panel.dataset.open = 'false';
+    panel.style.maxHeight = '0px';
+    void panel.offsetHeight;
+    panel.style.transition = prev;
+  }
+
+  function navH() { const n = document.querySelector('nav.site-nav'); return n ? n.offsetHeight : 0; }
+
+  function toggle(trigger) {
+    const id = 'detail-' + trigger.dataset.section;
+    const panel = document.getElementById(id);
+    if (!panel) return;
+    const wasOpen = trigger.getAttribute('aria-expanded') === 'true';
+    if (wasOpen) {
+      trigger.setAttribute('aria-expanded', 'false');
+      setOpen(panel, false);
+      return;
+    }
+    // Snap-close any open section
+    triggers.forEach(t => {
+      if (t === trigger) return;
+      if (t.getAttribute('aria-expanded') === 'true') {
+        t.setAttribute('aria-expanded', 'false');
+        snapClose(document.getElementById('detail-' + t.dataset.section));
+      }
+    });
+    // Scroll trigger into view below nav, then open
+    const offset = navH() + 12;
+    const top = trigger.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    trigger.setAttribute('aria-expanded', 'true');
+    setOpen(panel, true);
+  }
+
+  triggers.forEach(t => {
+    t.addEventListener('click', () => toggle(t));
+    t.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(t); }
+    });
+  });
+})();
+
+/* Chain-of-events deep links: open + scroll to the target section */
+(function() {
+  document.querySelectorAll('.coe-link[data-target]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const trig = document.querySelector('.cs-trigger[data-section="' + a.dataset.target + '"]');
+      if (!trig) return;
+      if (trig.getAttribute('aria-expanded') !== 'true') {
+        trig.click();
+      } else {
+        const n = document.querySelector('nav.site-nav');
+        const off = (n ? n.offsetHeight : 0) + 12;
+        const top = trig.getBoundingClientRect().top + window.scrollY - off;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+    });
+  });
+})();
+
+/* Scroll reveal */
+(function() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+})();
+</script>
+</body>
+</html>
