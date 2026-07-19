@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONVERj — Converged trade-off engine · Star Industry</title>
-<meta name="description" content="CONVERj is a converged trade-off engine for launch-vehicle and spacecraft architectures. One source of truth, coupled sub-system models, ranked KPIs across every variant — built in-house at Star Industry.">
+<title>CONVERj — One model of the vehicle · Star Industry</title>
+<meta name="description" content="CONVERj is an integrated architecture trade-study engine for launch vehicles and satellites. One model of the vehicle — every discipline reads and writes a single source of truth, from the first trade study to the production baseline. Built in-house at Star Industry.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -657,6 +657,37 @@
     margin-top: 2.5rem;
   }
 
+  /* ══════ REUSABLE CARD GRID (lifecycle / scope / views) ══════ */
+  .cj-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2.2rem;
+  }
+  .cj-card { background: var(--panel); padding: 1.7rem 1.5rem; border-top: 3px solid var(--amber); }
+  .cj-card .k {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.64rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 0.55rem;
+  }
+  .cj-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700; font-size: 1.05rem;
+    color: var(--white); margin-bottom: 0.5rem; line-height: 1.2;
+  }
+  .cj-card p { font-size: 0.82rem; color: var(--slate); line-height: 1.55; }
+  .cj-note {
+    margin-top: 2rem;
+    padding: 1.3rem 1.6rem;
+    background: rgba(125,211,252,0.06);
+    border-left: 3px solid var(--sky);
+    font-size: 0.88rem; color: var(--slate); line-height: 1.6;
+  }
+  .cj-note strong { color: var(--white); font-weight: 600; }
+
     /* ══════ CTA BANNER ══════ */
   .cta-banner {
     padding: clamp(3.5rem, 7vw, 6rem) var(--gutter);
@@ -731,7 +762,7 @@
 
 <!-- ══════ ANNOUNCEMENT BANNER ══════ -->
 <div class="banner">
-  Built in-house at Star Industry · Two-week scoping engagements available · <a href="mailto:company@starindustry.space?subject=CONVERj%20engagement">company@starindustry.space →</a>
+  Built in-house at Star Industry · Live demo available on request · <a href="mailto:company@starindustry.space?subject=CONVERj%20demo%20access">company@starindustry.space →</a>
 </div>
 
 <!-- ══════ NAV ══════ -->
@@ -739,9 +770,9 @@
   <a href="index.html" style="text-decoration:none;"><div class="nav-logo">STAR <span>INDUSTRY</span></div></a>
   <div class="nav-right">
     <ul class="nav-links">
-      <li><a href="index.html#offerings">Offerings</a></li>
+      <li><a href="index.html#offerings">Mission Engineering</a></li>
       <li><a href="converj.html" class="active">CONVERj</a></li>
-      <li><a href="index.html#roadmap">Roadmap</a></li>
+      <li><a href="caseStudies/ng4/case-study-ng4.html">Case Studies</a></li>
       <li><a href="about.html">About</a></li>
     </ul>
     <a href="index.html#contact" class="nav-cta">Contact</a>
@@ -754,21 +785,21 @@
   <div class="hero-grid"></div>
 
   <div class="hero-inner">
-    <div class="hero-eyebrow"><span class="pulse"></span>Tier 2 · Digital Engineering · Star Industry</div>
+    <div class="hero-eyebrow"><span class="pulse"></span>Digital Engineering · Star Industry</div>
 
     <div class="hero-wordmark"><img src="assets/converj_wordmark.png" alt="CONVERj" class="converj-wordmark-hero"></div>
-    <h1>Trade studies in <em>minutes</em>, not weeks.</h1>
+    <h1>One model of the vehicle, <em>useful at every phase.</em></h1>
     <p class="hero-sub">
-      A converged trade-off engine for launch-vehicle and spacecraft architectures. One source of truth, coupled sub-system models, with ranked KPIs across every variant — built in-house at Star Industry.
+      An integrated architecture trade-study engine for launch vehicles and satellites. Every variant is a single file that each discipline model reads and writes — so one description of the vehicle stays consistent from the first trade study to the production baseline. Trade studies run in minutes, not weeks.
     </p>
 
     <div class="hero-cta">
-      <a href="#engage" class="btn btn-primary">Two-week Scoping <span class="arrow">→</span></a>
+      <a href="#demo" class="btn btn-primary">Request a Demo <span class="arrow">→</span></a>
       <a href="#arcas" class="btn btn-ghost">See Worked Example</a>
     </div>
 
     <div class="hero-proof">
-      <div class="proof-item"><span class="proof-dot"></span>One architecture JSON</div>
+      <div class="proof-item"><span class="proof-dot"></span>One file per architecture</div>
       <div class="proof-item"><span class="proof-dot"></span>Coupled convergence loop</div>
       <div class="proof-item"><span class="proof-dot"></span>Ranked KPIs across variants</div>
       <div class="proof-item"><span class="proof-dot"></span>SysON round-trip</div>
@@ -787,13 +818,57 @@
   </div>
 </section>
 
+<!-- ══════ ONE MODEL / LIFECYCLE ══════ -->
+<section class="story" id="lifecycle">
+  <div class="story-inner">
+    <span class="label">One Model · Every Phase</span>
+    <h2 class="display">Continuous integration <em>for hardware.</em></h2>
+    <p class="lede">The same architecture file underpins the whole programme — models, dashboard and the SysON bridge all read and write it. No re-modelling between phases, no drift between tools; each model can be swapped for a higher-fidelity version as the design matures.</p>
+    <div class="cj-cards">
+      <div class="cj-card"><div class="k">01 · Trade Studies</div><h4>Explore the space</h4><p>Rank dozens of architectures on payload, cost and T/W — decide with evidence, not spreadsheets.</p></div>
+      <div class="cj-card"><div class="k">02 · Design</div><h4>Size the vehicle</h4><p>Coupled propulsion, tank, mass and cost models converge automatically for each variant; the optimiser closes the &Delta;v budget.</p></div>
+      <div class="cj-card"><div class="k">03 · Qualification</div><h4>Prove compliance</h4><p>Every requirement checked against the live model, with the SysON product tree kept authoritative both ways.</p></div>
+      <div class="cj-card"><div class="k">04 · Production</div><h4>Hold the baseline</h4><p>Mass and cost resolved down to the part, and tracked as the design matures toward build.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ HOW IT WORKS ══════ -->
+<section class="story alt" id="how">
+  <div class="story-inner">
+    <span class="label">How It Works</span>
+    <h2 class="display">One file. A model chain. <em>A clean SysON seam.</em></h2>
+    <p class="lede">The architecture file is the single source of truth during computation — each model reads its inputs by name and writes only its own section, so the numbers can never fall out of step.</p>
+    <div class="pipe">
+      <div class="pipe-row">
+        <div class="pipe-n">01</div>
+        <div class="pipe-name">Source of truth</div>
+        <div class="pipe-desc">One file per architecture, with clear section ownership — meta, mission, propulsion, tank, mass, performance, cost, KPIs. Each model reads by dotted path and writes only what it owns.</div>
+        <div class="pipe-tag pt-conv">File</div>
+      </div>
+      <div class="pipe-row">
+        <div class="pipe-n">02</div>
+        <div class="pipe-name">The conductor</div>
+        <div class="pipe-desc">Runs the models in dependency order from the N2 interface diagram, iterating coupled loops — e.g. tank &#8646; COPV — until residuals converge below tolerance, automatically, for every variant.</div>
+        <div class="pipe-tag pt-bridge">Convergence</div>
+      </div>
+      <div class="pipe-row">
+        <div class="pipe-n">03</div>
+        <div class="pipe-name">SysON bridge</div>
+        <div class="pipe-desc">A config-driven bridge seeds the architecture from the SysON product tree and writes converged outputs back — without ever owning the tree. The round-trip is only needed at the start and the end.</div>
+        <div class="pipe-tag pt-syson">SysON</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════ PROBLEM SECTION ══════ -->
 <section class="story" id="problem">
   <div class="story-inner">
     <span class="label">Case Study · The Trade-Study Problem</span>
     <h2 class="display">Replace the <em>workbook stack.</em></h2>
     <p class="lede">
-      Architecture decisions hinge on coupled sub-system models. Running them by hand is slow, lossy and opaque. CONVERj replaces the workbook stack with one architecture JSON and one convergence loop &mdash; so trade studies run in minutes, not weeks.
+      Architecture decisions hinge on tightly coupled models. Running them by hand is slow, lossy and opaque &mdash; and the design is never done, it's re-baselined. Every iteration shifts the numbers you were just tracking, and everything downstream moves with them. CONVERj replaces the workbook stack with one architecture file and one convergence loop &mdash; so trade studies run in minutes, not weeks, and stay current as the design moves.
     </p>
 
     <button class="sec-toggle" type="button" data-sec="problem" aria-expanded="false" aria-controls="problem-detail">
@@ -885,6 +960,37 @@
   </div>
 </section>
 
+<!-- ══════ SCOPE ══════ -->
+<section class="story" id="scope">
+  <div class="story-inner">
+    <span class="label">Scope</span>
+    <h2 class="display">Orbital, suborbital, satellite &mdash; <em>one tool.</em></h2>
+    <p class="lede">The architecture's class drives which models run and how the app renders it. A per-architecture list selects the disciplines that matter for each vehicle.</p>
+    <div class="cj-cards">
+      <div class="cj-card"><div class="k">Launch · Orbital</div><h4>1–4 stages to LEO / SSO</h4><p>Liquid or solid propulsion, sized by the full model chain and closed by a 3DOF performance model that flies the vehicle to orbit.</p></div>
+      <div class="cj-card"><div class="k">Launch · Suborbital</div><h4>Sounding rockets &amp; hoppers</h4><p>Solid-motor or liquid-feed stacks flown by the trajectory engine to apogee. Heritage-validated against the ARCAS sounding rocket.</p></div>
+      <div class="cj-card"><div class="k">Satellites</div><h4>Microsat → largesat</h4><p>The launch-vehicle chain swaps for a bus-sizing pipeline: power, comms link budget and microgravity disturbance models.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SIX VIEWS ══════ -->
+<section class="story alt" id="views">
+  <div class="story-inner">
+    <span class="label">The App · Six Working Views</span>
+    <h2 class="display">The same machinery, <em>driven from a browser.</em></h2>
+    <p class="lede">Load a project, edit the architecture, run the models, watch the KPIs update.</p>
+    <div class="cj-cards">
+      <div class="cj-card"><div class="k">Mission</div><h4>Requirements in, &Delta;v out</h4><p>Define the mission and its requirements; each is mapped to a KPI and auto-verified against the live model.</p></div>
+      <div class="cj-card"><div class="k">Architecture</div><h4>Configuration &amp; KPIs</h4><p>Live vehicle diagram redrawn from the schema, editable choices, KPI cards with pass / fail dots.</p></div>
+      <div class="cj-card"><div class="k">Optimise</div><h4>Size to the mission</h4><p>Size the vehicle to the mission automatically — the optimiser closes the &Delta;v budget.</p></div>
+      <div class="cj-card"><div class="k">Product Tree</div><h4>Resolved to the part</h4><p>Declared vs computed mass and cost for every part, with divergences beyond tolerance flagged.</p></div>
+      <div class="cj-card"><div class="k">Trajectory</div><h4>3DOF ascent to orbit</h4><p>Ground track, staging events, max-Q and burn times fall straight out of the flown trajectory.</p></div>
+      <div class="cj-card"><div class="k">Compare</div><h4>Rank every variant</h4><p>Cross-architecture ranking by any KPI, filter or custom expression — live.</p></div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════ TRADE-OFF SECTION ══════ -->
 <section class="story" id="tradeoff">
   <div class="story-inner">
@@ -917,30 +1023,65 @@
   </div>
 </section>
 
+<!-- ══════ KPIS & EXTENSIBILITY ══════ -->
+<section class="story" id="extend">
+  <div class="story-inner">
+    <span class="label">KPIs &amp; Extensibility</span>
+    <h2 class="display">Consistent KPIs. <em>New models by config.</em></h2>
+    <p class="lede">Every architecture reports the same KPI set &mdash; max payload, total &Delta;v, wet mass, T/W at liftoff, total cost, cost per kg, payload fraction and convergence status &mdash; so any two variants are directly comparable.</p>
+    <div class="cj-note">
+      <strong>Add by config, not by code.</strong> A new model drops into a model folder with its read/write contract named &mdash; the conductor auto-detects it. A new KPI is one entry in the mapping file, and every architecture picks it up on the next run. One config file, zero code changes.
+    </div>
+  </div>
+</section>
+
+<!-- ══════ DEMO ══════ -->
+<section class="story alt" id="demo">
+  <div class="story-inner">
+    <span class="label label-sky">See It Live</span>
+    <h2 class="display">Try <em>CONVERj</em> for yourself.</h2>
+    <p class="lede">Two ways in, both on request: a hands-on demo instance with a limited feature set you can explore at your own pace, or a live walkthrough of the full tool with our team.</p>
+    <div class="cj-cards">
+      <div class="cj-card">
+        <div class="k">Hands-on</div>
+        <h4>Limited-feature demo</h4>
+        <p>Request access to a live demo instance and explore the workflow, dashboard and compare view at your own pace.</p>
+        <p style="margin-top:1rem;"><a href="mailto:company@starindustry.space?subject=CONVERj%20demo%20access" class="text-link">Request demo access <span class="arrow">&rarr;</span></a></p>
+      </div>
+      <div class="cj-card">
+        <div class="k">Guided</div>
+        <h4>Full walkthrough</h4>
+        <p>Book a live walkthrough of the full tool with our team &mdash; run against a mission close to yours.</p>
+        <p style="margin-top:1rem;"><a href="mailto:company@starindustry.space?subject=CONVERj%20walkthrough" class="text-link">Book a walkthrough <span class="arrow">&rarr;</span></a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════ ENGAGEMENT MODEL ══════ -->
 <section class="story" id="engage">
   <div class="story-inner">
     <span class="label">Engagement Model</span>
-    <h2 class="display">Three phases. <em>Clear scope.</em></h2>
+    <h2 class="display">Three phases. <em>Bespoke scope.</em></h2>
     <p class="lede">
-      Every engagement starts with a short scoping call, then moves to a fixed-price contract with binding deliverables — no open-ended retainers or T&amp;M surprises. Scope and deliverables are agreed jointly before work begins. Indicative durations are for a typical launch-vehicle trade study; timelines flex to match your programme cadence.
+      Every engagement is scoped and priced individually &mdash; tell us your mission and we shape the work around your programme. A typical trade study runs in three phases; the durations below are indicative and flex to match your cadence.
     </p>
 
     <div class="phases">
       <div class="phase">
-        <div class="phase-num">Phase 1 · Scope &amp; Seed</div>
+        <div class="phase-num">Phase 1 &middot; Scope &amp; Seed</div>
         <div class="phase-dur">2 weeks</div>
         <h4>Ingest your mission requirement.</h4>
         <p>We ingest your mission requirement, stand up the systems-engineering baseline, and seed a candidate architecture. <strong style="color:var(--white);font-weight:500;">Outputs:</strong> scoping memo, initial requirements set, baseline architecture.</p>
       </div>
       <div class="phase">
-        <div class="phase-num">Phase 2 · Trade Study</div>
-        <div class="phase-dur">4 – 8 weeks</div>
+        <div class="phase-num">Phase 2 &middot; Trade Study</div>
+        <div class="phase-dur">4 &ndash; 8 weeks</div>
         <h4>Run every variant of interest.</h4>
-        <p>We run the model chain across every variant of interest — propellant, staging, engine count. You receive ranked KPIs, convergence reports, and the live CONVERj dashboard.</p>
+        <p>We run the model chain across every variant of interest &mdash; propellant, staging, engine count. You receive ranked KPIs, convergence reports, and the live CONVERj dashboard.</p>
       </div>
       <div class="phase">
-        <div class="phase-num">Phase 3 · Handover</div>
+        <div class="phase-num">Phase 3 &middot; Handover</div>
         <div class="phase-dur">2 weeks</div>
         <h4>Your team keeps the output.</h4>
         <p>Your team keeps the repository. We train on conductor use, model authoring and the SysON round-trip. Ongoing support by retainer.</p>
@@ -948,7 +1089,7 @@
     </div>
 
     <div class="phases-note">
-      Three phases. Clear scope. <strong>Your team keeps the output.</strong>
+      Three phases. Bespoke scope. <strong>Your team keeps the output.</strong>
     </div>
   </div>
 </section>
@@ -958,10 +1099,10 @@
   <span class="label">Let&rsquo;s Work Together</span>
   <h2 class="display"><em>Bring your mission.</em> <span class="light">Together we&rsquo;ll</span><br><img src="assets/converj_wordmark.png" alt="CONVERj" class="converj-wordmark-h"><br><span class="light">on your architecture.</span></h2>
   <p class="lede">
-    Two-week scoping phase to translate your objective into a structured trade study — delivered as ranked architectures in CONVERj, with a trajectory and performance baseline attached.
+    Bring us your mission requirement and your SysON model. We run the trade study. You decide. Every engagement is scoped and priced to your programme.
   </p>
   <div class="cta-banner-actions">
-    <a href="mailto:company@starindustry.space?subject=CONVERj%20engagement" class="btn btn-primary">Start Scoping <span class="arrow">→</span></a>
+    <a href="mailto:company@starindustry.space?subject=CONVERj%20enquiry" class="btn btn-primary">Contact Us <span class="arrow">&rarr;</span></a>
     <a href="index.html" class="btn btn-ghost">Back to Star Industry</a>
   </div>
 </section>
@@ -971,29 +1112,30 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="nav-logo">STAR <span>INDUSTRY</span></div>
-      <p>A European engineering company building the systems that move beyond LEO.</p>
+      <p>A space-engineering consultancy for mission analysis, flight-safety analysis and mission architecture &mdash; powered by CONVERj.</p>
     </div>
     <div>
-      <h6>Offerings</h6>
+      <h6>Mission Engineering</h6>
       <ul>
-        <li><a href="index.html#offerings">Tier 1 &middot; Services</a></li>
-        <li><a href="index.html#offerings">Tier 2 &middot; Products</a></li>
-        <li><a href="index.html#offerings">Tier 3 &middot; Vehicles</a></li>
+        <li><a href="index.html#offerings">Architecture Design</a></li>
+        <li><a href="index.html#offerings">Trade-off Studies</a></li>
+        <li><a href="index.html#offerings">Mission Analysis</a></li>
+        <li><a href="index.html#offerings">Flight Safety Analysis</a></li>
       </ul>
     </div>
     <div>
       <h6>Company</h6>
       <ul>
         <li><a href="about.html">About / Team</a></li>
-        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="caseStudies/ng4/case-study-ng4.html">Case Studies</a></li>
         <li><a href="index.html#contact">Contact</a></li>
         <li><a href="mailto:company@starindustry.space">company@starindustry.space</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>&copy; 2026 Star Industry Ltd &middot; Company No. 17048178 &middot; Forres, Inverness, UK</span>
-    <span class="footer-tag">// Engineering the in-space economy</span>
+    <span>&copy; 2026 Star Industry Ltd &middot; Company No. 17048178</span>
+    <span class="footer-tag">// Mission &amp; flight-safety analysis</span>
   </div>
 </footer>
 
@@ -1060,8 +1202,6 @@
     requestAnimationFrame(draw);
   }
   addEventListener('resize', ()=>{ resize(); initStars(); });
-  /* When the tab regains focus after being hidden, throw away any shooters
-     that were queued so we don't get a "meteor shower" catch-up. */
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) shooters.length = 0;
   });
@@ -1071,10 +1211,6 @@
 /* Section accordion (Problem / ARCAS / Trade-off / Engagement) */
 (function() {
   const toggles = document.querySelectorAll('.sec-toggle[data-sec]');
-  function navHeight() {
-    const nav = document.querySelector('nav.site-nav');
-    return nav ? nav.offsetHeight : 0;
-  }
   function setOpen(panel, open) {
     if (open) {
       panel.dataset.open = 'true';
